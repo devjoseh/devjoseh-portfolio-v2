@@ -1,830 +1,774 @@
-"use client";
+"use client"
 
-import type React from "react";
+import type React from "react"
 
-import { useState, useEffect, useCallback } from "react";
-import { createPortal } from "react-dom";
-import Image from "next/image";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-} from "@/components/ui/dialog";
-import {
-    X,
-    ChevronLeft,
-    ChevronRight,
-    Calendar,
-    Trophy,
-    Eye,
-    MousePointer,
-    Sparkles,
-    Maximize2,
-} from "lucide-react";
-import { getHackathons, type Hackathon } from "@/utils/actions/data";
-import { useRef } from "react";
+import { useState, useEffect, useCallback, useRef } from "react"
+import { createPortal } from "react-dom"
+import Image from "next/image"
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { X, ChevronLeft, ChevronRight, Calendar, Trophy, Eye, MousePointer, Sparkles, Maximize2 } from "lucide-react"
+import { getHackathons, type Hackathon } from "@/utils/actions/data"
 
-// Full-screen image viewer with enhanced mobile support
+// Enhanced full-screen image viewer with comprehensive mobile support
 function FullScreenImageViewer({
-    imageUrl,
-    imageAlt,
-    onClose,
+  imageUrl,
+  imageAlt,
+  onClose,
 }: {
-    imageUrl: string;
-    imageAlt: string;
-    onClose: () => void;
+  imageUrl: string
+  imageAlt: string
+  onClose: () => void
 }) {
-    const [isMounted, setIsMounted] = useState(false);
-    const [isClosing, setIsClosing] = useState(false);
-    const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [isMounted, setIsMounted] = useState(false)
+  const backdropRef = useRef<HTMLDivElement>(null)
+  const closeButtonRef = useRef<HTMLButtonElement>(null)
+  const zoomButtonRef = useRef<HTMLButtonElement>(null)
 
-    useEffect(() => {
-        setIsMounted(true);
+  useEffect(() => {
+    setIsMounted(true)
 
-        // Prevent body scroll and ensure proper layering
-        const originalOverflow = document.body.style.overflow;
-        const originalPosition = document.body.style.position;
-        const originalTouchAction = document.body.style.touchAction;
+    // Store original body styles for restoration
+    const originalOverflow = document.body.style.overflow
+    const originalPosition = document.body.style.position
+    const originalTouchAction = document.body.style.touchAction
+    const originalUserSelect = document.body.style.userSelect
 
-        document.body.style.overflow = "hidden";
-        document.body.style.position = "fixed";
-        document.body.style.touchAction = "none";
-        document.body.style.width = "100%";
-        document.body.style.height = "100%";
+    // Prevent body interactions and scrolling
+    document.body.style.overflow = "hidden"
+    document.body.style.position = "relative"
+    document.body.style.touchAction = "none"
+    document.body.style.userSelect = "none"
 
-        // Keyboard handling
-        const handleKeyDown = (event: KeyboardEvent) => {
-            if (event.key === "Escape") {
-                event.preventDefault();
-                event.stopPropagation();
-                handleClose();
-            }
-        };
-
-        document.addEventListener("keydown", handleKeyDown, { 
-            capture: true,
-            passive: false 
-        });
-
-        return () => {
-            document.body.style.overflow = originalOverflow;
-            document.body.style.position = originalPosition;
-            document.body.style.touchAction = originalTouchAction;
-            document.body.style.width = "";
-            document.body.style.height = "";
-            document.removeEventListener("keydown", handleKeyDown, {
-                capture: true,
-            });
-            
-            if (closeTimeoutRef.current) {
-                clearTimeout(closeTimeoutRef.current);
-            }
-            
-            setIsMounted(false);
-        };
-    }, []);
-
-    // Unified close handler with debouncing
-    const handleClose = useCallback(() => {
-        if (isClosing) return;
-        
-        setIsClosing(true);
-        
-        // Clear any existing timeout
-        if (closeTimeoutRef.current) {
-            clearTimeout(closeTimeoutRef.current);
-        }
-        
-        // Small delay to ensure proper cleanup
-        closeTimeoutRef.current = setTimeout(() => {
-            onClose();
-        }, 100);
-    }, [onClose, isClosing]);
-
-    // Mobile-first unified interaction handler
-    const handleInteraction = useCallback((
-        event: React.MouseEvent | React.TouchEvent,
-        action: 'close' | 'backdrop'
-    ) => {
-        event.preventDefault();
-        event.stopPropagation();
-        
-        // Prevent multiple rapid interactions
-        if (isClosing) return;
-        
-        // For touch events, add haptic feedback if available
-        if ('vibrate' in navigator && event.type.includes('touch')) {
-            navigator.vibrate(50);
-        }
-        
-        if (action === 'close') {
-            handleClose();
-        } else if (action === 'backdrop' && event.target === event.currentTarget) {
-            handleClose();
-        }
-    }, [handleClose, isClosing]);
-
-    // Prevent image interactions
-    const handleImageInteraction = useCallback((
-        event: React.MouseEvent | React.TouchEvent
-    ) => {
-        event.preventDefault();
-        event.stopPropagation();
-    }, []);
-
-    // Don't render on server or when closing
-    if (!isMounted || typeof window === "undefined") {
-        return null;
+    // Handle viewport meta for iOS Safari
+    const viewportMeta = document.querySelector('meta[name="viewport"]') as HTMLMetaElement
+    const originalViewportContent = viewportMeta?.content || ""
+    if (viewportMeta) {
+      viewportMeta.content = "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     }
 
-    const fullScreenContent = (
-        <div
-            className={`fixed inset-0 bg-black/95 flex items-center justify-center p-4 transition-opacity duration-300 ${
-                isClosing ? 'opacity-0' : 'opacity-100'
-            }`}
-            style={{
-                zIndex: 99999,
-                position: "fixed",
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                touchAction: "none",
-                WebkitTouchCallout: "none",
-                WebkitUserSelect: "none",
-                userSelect: "none",
-            }}
-            onClick={(e) => handleInteraction(e, 'backdrop')}
-            onTouchEnd={(e) => handleInteraction(e, 'backdrop')}
-            role="dialog"
-            aria-modal="true"
-            aria-label="Full screen image view"
-        >
-            {/* Close button with mobile-optimized touch target */}
-            <Button
-                onClick={(e) => handleInteraction(e, 'close')}
-                onTouchEnd={(e) => handleInteraction(e, 'close')}
-                disabled={isClosing}
-                className={`absolute top-4 right-4 p-4 rounded-full bg-gray-900/90 hover:bg-gray-800/95 text-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 shadow-lg ${
-                    isClosing ? 'opacity-50 cursor-not-allowed' : 'active:scale-95 cursor-pointer'
-                }`}
-                style={{
-                    zIndex: 9999999999999,
-                    touchAction: "manipulation",
-                    WebkitTapHighlightColor: "transparent",
-                    WebkitTouchCallout: "none",
-                    WebkitUserSelect: "none",
-                    userSelect: "none",
-                    minWidth: "48px",
-                    minHeight: "48px",
-                }}
-                aria-label="Close full screen view"
-            >
-                <X className="w-6 h-6" />
-            </Button>
+    // Enhanced keyboard handling
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault()
+        event.stopPropagation()
+        onClose()
+      }
+    }
 
-            {/* Image container with improved mobile handling */}
-            <div
-                className="relative max-w-[95vw] max-h-[95vh] flex items-center justify-center"
-                style={{ zIndex: 100000 }}
-                onClick={handleImageInteraction}
-                onTouchEnd={handleImageInteraction}
-            >
-                <Image
-                    src={imageUrl || "/placeholder.svg"}
-                    alt={imageAlt}
-                    width={1920}
-                    height={1080}
-                    className={`max-w-full max-h-full object-contain rounded-lg shadow-2xl transition-transform duration-300 ${
-                        isClosing ? 'scale-95' : 'scale-100'
-                    }`}
-                    priority
-                    quality={90}
-                    style={{
-                        maxWidth: "95vw",
-                        maxHeight: "95vh",
-                        userSelect: "none",
-                        pointerEvents: "none",
-                        touchAction: "none",
-                        WebkitUserSelect: "none",
-                        WebkitTouchCallout: "none",
-                    }}
-                    draggable={false}
-                    onError={() => console.warn("Failed to load full-screen image")}
-                />
-            </div>
-        </div>
-    );
+    // Add event listeners with proper options
+    document.addEventListener("keydown", handleKeyDown, { capture: true, passive: false })
 
-    // Use portal to render at document body level with highest z-index
-    return createPortal(fullScreenContent, document.body);
+    // Cleanup function
+    return () => {
+      document.body.style.overflow = originalOverflow
+      document.body.style.position = originalPosition
+      document.body.style.touchAction = originalTouchAction
+      document.body.style.userSelect = originalUserSelect
+
+      // Restore viewport meta
+      if (viewportMeta && originalViewportContent) {
+        viewportMeta.content = originalViewportContent
+      }
+
+      document.removeEventListener("keydown", handleKeyDown, { capture: true })
+      setIsMounted(false)
+    }
+  }, [onClose])
+
+  // Enhanced close handler with multiple fallback mechanisms
+  const handleClose = useCallback(
+    (event?: React.MouseEvent | React.TouchEvent | Event) => {
+      if (event) {
+        event.preventDefault()
+        event.stopPropagation()
+      }
+
+      // Use requestAnimationFrame to ensure proper timing
+      requestAnimationFrame(() => {
+        onClose()
+      })
+    },
+    [onClose],
+  )
+
+  // Backdrop interaction handler with enhanced validation
+  const handleBackdropInteraction = useCallback(
+    (event: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
+      // Ensure we're clicking/touching the backdrop itself
+      if (event.target === event.currentTarget || event.target === backdropRef.current) {
+        handleClose(event)
+      }
+    },
+    [handleClose],
+  )
+
+  // Enhanced close button handler with comprehensive event support
+  const handleCloseButtonClick = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement> | React.TouchEvent<HTMLButtonElement>) => {
+      handleClose(event)
+    },
+    [handleClose],
+  )
+
+  // Prevent image interactions
+  const handleImageInteraction = useCallback((event: React.MouseEvent | React.TouchEvent) => {
+    event.preventDefault()
+    event.stopPropagation()
+  }, [])
+
+  // Don't render on server or if not mounted
+  if (!isMounted || typeof window === "undefined") {
+    return null
+  }
+
+  const fullScreenContent = (
+    <div
+      ref={backdropRef}
+      className="fixed inset-0 bg-black/95 flex items-center justify-center p-4 z-[99999]"
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        touchAction: "none",
+        WebkitTouchCallout: "none",
+        WebkitUserSelect: "none",
+        userSelect: "none",
+      }}
+      onClick={handleBackdropInteraction}
+      onTouchEnd={handleBackdropInteraction}
+      onTouchStart={(e) => {
+        // Prevent default touch behavior on backdrop
+        if (e.target === e.currentTarget) {
+          e.preventDefault()
+        }
+      }}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Full screen image view"
+    >
+      {/* Enhanced close button with comprehensive interaction support */}
+      <button
+        ref={closeButtonRef}
+        type="button"
+        onClick={handleCloseButtonClick}
+        onTouchEnd={handleCloseButtonClick}
+        onTouchStart={(e) => {
+          e.preventDefault()
+          e.stopPropagation()
+        }}
+        onMouseDown={(e) => {
+          e.preventDefault()
+          e.stopPropagation()
+        }}
+        className="absolute top-4 right-4 p-3 rounded-full bg-gray-900/95 hover:bg-gray-800/95 text-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 shadow-lg active:scale-95 z-[100001]"
+        style={{
+          touchAction: "manipulation",
+          WebkitTapHighlightColor: "transparent",
+          WebkitTouchCallout: "none",
+          WebkitUserSelect: "none",
+          userSelect: "none",
+        }}
+        aria-label="Close full screen view"
+      >
+        <X className="w-6 h-6" />
+      </button>
+
+      {/* Enhanced zoom out button */}
+      <button
+        ref={zoomButtonRef}
+        type="button"
+        onClick={handleCloseButtonClick}
+        onTouchEnd={handleCloseButtonClick}
+        onTouchStart={(e) => {
+          e.preventDefault()
+          e.stopPropagation()
+        }}
+        onMouseDown={(e) => {
+          e.preventDefault()
+          e.stopPropagation()
+        }}
+        className="absolute top-4 left-4 p-3 rounded-full bg-gray-900/95 hover:bg-gray-800/95 text-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 shadow-lg active:scale-95 z-[100001]"
+        style={{
+          touchAction: "manipulation",
+          WebkitTapHighlightColor: "transparent",
+          WebkitTouchCallout: "none",
+          WebkitUserSelect: "none",
+          userSelect: "none",
+        }}
+        aria-label="Zoom out"
+      >
+        <Maximize2 className="w-6 h-6 rotate-180" />
+      </button>
+
+      {/* Image container with enhanced interaction prevention */}
+      <div
+        className="relative max-w-[95vw] max-h-[95vh] flex items-center justify-center z-[100000]"
+        onClick={handleImageInteraction}
+        onTouchEnd={handleImageInteraction}
+        onTouchStart={handleImageInteraction}
+        style={{
+          touchAction: "none",
+          WebkitTouchCallout: "none",
+          WebkitUserSelect: "none",
+          userSelect: "none",
+        }}
+      >
+        <Image
+          src={imageUrl || "/placeholder.svg"}
+          alt={imageAlt}
+          width={1920}
+          height={1080}
+          className="max-w-full max-h-full object-contain rounded-lg shadow-2xl"
+          priority
+          quality={90}
+          style={{
+            maxWidth: "95vw",
+            maxHeight: "95vh",
+            userSelect: "none",
+            pointerEvents: "none",
+            touchAction: "none",
+            WebkitTouchCallout: "none",
+            WebkitUserSelect: "none",
+          }}
+          draggable={false}
+          onError={() => console.warn("Failed to load full-screen image")}
+          onContextMenu={(e) => e.preventDefault()}
+        />
+      </div>
+
+      {/* Enhanced instructions with device-specific text */}
+      <div
+        className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-gray-900/95 backdrop-blur-sm rounded-full px-4 py-2 border border-gray-600/50 z-[100001]"
+        style={{
+          touchAction: "none",
+          WebkitTouchCallout: "none",
+          WebkitUserSelect: "none",
+          userSelect: "none",
+        }}
+      >
+        <span className="text-white text-sm font-medium">
+          <span className="hidden sm:inline">Press ESC, click X, or click outside to close</span>
+          <span className="sm:hidden">Tap X or tap outside to close</span>
+        </span>
+      </div>
+    </div>
+  )
+
+  // Use portal to render at document body level
+  return createPortal(fullScreenContent, document.body)
 }
 
 export function HackathonsSection() {
-    const [hackathons, setHackathons] = useState<Hackathon[]>([]);
-    const [selectedHackathon, setSelectedHackathon] =
-        useState<Hackathon | null>(null);
-    const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
-    const [loading, setLoading] = useState(true);
-    const [hoveredCard, setHoveredCard] = useState<string | null>(null);
-    const [fullScreenImage, setFullScreenImage] = useState<{
-        url: string;
-        alt: string;
-    } | null>(null);
+  const [hackathons, setHackathons] = useState<Hackathon[]>([])
+  const [selectedHackathon, setSelectedHackathon] = useState<Hackathon | null>(null)
+  const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0)
+  const [loading, setLoading] = useState(true)
+  const [hoveredCard, setHoveredCard] = useState<string | null>(null)
+  const [fullScreenImage, setFullScreenImage] = useState<{
+    url: string
+    alt: string
+  } | null>(null)
 
-    useEffect(() => {
-        const fetchHackathons = async () => {
-            try {
-                const data = await getHackathons();
-                setHackathons(data);
-            } catch (error) {
-                console.error("Error fetching hackathons:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchHackathons();
-    }, []);
-
-    const getPlacementColor = (type: string) => {
-        switch (type) {
-            case "winner":
-                return "bg-yellow-500/80 text-yellow-100 border-yellow-400/80 hover:bg-yellow-400/90";
-            case "finalist":
-                return "bg-blue-500/80 text-blue-100 border-blue-400/80 hover:bg-blue-400/90";
-            default:
-                return "bg-purple-500/80 text-purple-100 border-purple-400/80 hover:bg-purple-400/90";
-        }
-    };
-
-    // Modal management - preserve modal state when full-screen is active
-    const openModal = useCallback((hackathon: Hackathon) => {
-        setSelectedHackathon(hackathon);
-        setCurrentPhotoIndex(0);
-    }, []);
-
-    const closeModal = useCallback(() => {
-        // Only close modal if full-screen is not active
-        if (!fullScreenImage) {
-            setSelectedHackathon(null);
-            setCurrentPhotoIndex(0);
-        }
-    }, [fullScreenImage]);
-
-    // Force close modal (used when modal dialog itself is closed)
-    const forceCloseModal = useCallback(() => {
-        setSelectedHackathon(null);
-        setCurrentPhotoIndex(0);
-        setFullScreenImage(null); // Also close full-screen if open
-    }, []);
-
-    // Photo navigation - only when not in full-screen
-    const nextPhoto = useCallback(() => {
-        if (
-            selectedHackathon &&
-            selectedHackathon.photos.length > 1 &&
-            !fullScreenImage
-        ) {
-            setCurrentPhotoIndex(
-                (prev) => (prev + 1) % selectedHackathon.photos.length
-            );
-        }
-    }, [selectedHackathon, fullScreenImage]);
-
-    const prevPhoto = useCallback(() => {
-        if (
-            selectedHackathon &&
-            selectedHackathon.photos.length > 1 &&
-            !fullScreenImage
-        ) {
-            setCurrentPhotoIndex(
-                (prev) =>
-                    (prev - 1 + selectedHackathon.photos.length) %
-                    selectedHackathon.photos.length
-            );
-        }
-    }, [selectedHackathon, fullScreenImage]);
-
-    // Full-screen image handling - preserves parent modal
-    const openFullScreenImage = useCallback(() => {
-        if (selectedHackathon && selectedHackathon.photos[currentPhotoIndex]) {
-            const photo = selectedHackathon.photos[currentPhotoIndex];
-            setFullScreenImage({
-                url: photo.url,
-                alt: photo.alt,
-            });
-        }
-    }, [selectedHackathon, currentPhotoIndex]);
-
-    const closeFullScreenImage = useCallback(() => {
-        setFullScreenImage(null);
-        // Parent modal (selectedHackathon) remains open
-    }, []);
-
-    // Keyboard navigation for modal (disabled when full-screen is active)
-    useEffect(() => {
-        if (!selectedHackathon || fullScreenImage) return;
-
-        const handleKeyDown = (event: KeyboardEvent) => {
-            switch (event.key) {
-                case "ArrowLeft":
-                    event.preventDefault();
-                    prevPhoto();
-                    break;
-                case "ArrowRight":
-                    event.preventDefault();
-                    nextPhoto();
-                    break;
-                case "Escape":
-                    event.preventDefault();
-                    closeModal();
-                    break;
-            }
-        };
-
-        document.addEventListener("keydown", handleKeyDown);
-        return () => document.removeEventListener("keydown", handleKeyDown);
-    }, [selectedHackathon, fullScreenImage, prevPhoto, nextPhoto, closeModal]);
-
-    // Handle modal dialog open/close - prevent closing when full-screen is active
-    const handleModalOpenChange = useCallback(
-        (open: boolean) => {
-            if (!open) {
-                if (fullScreenImage) {
-                    // If full-screen is open, close it first but keep modal open
-                    setFullScreenImage(null);
-                } else {
-                    // If full-screen is not open, close the modal
-                    forceCloseModal();
-                }
-            }
-        },
-        [fullScreenImage, forceCloseModal]
-    );
-
-    // Enhanced image expand handler with mobile support
-    const handleImageExpand = useCallback(
-        (event: React.MouseEvent | React.TouchEvent) => {
-            if (fullScreenImage) return;
-
-            event.preventDefault();
-            event.stopPropagation();
-            
-            // Add small delay for touch events to prevent conflicts
-            if (event.type === 'touchend') {
-                setTimeout(() => {
-                    openFullScreenImage();
-                }, 50);
-            } else {
-                openFullScreenImage();
-            }
-        },
-        [fullScreenImage, openFullScreenImage]
-    );
-
-    if (loading) {
-        return (
-            <section className="py-16 md:py-20 bg-gray-900">
-                <div className="container mx-auto px-0">
-                    <div className="text-center mb-12 md:mb-16">
-                        <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 bg-gradient-to-r from-purple-400 to-purple-600 bg-clip-text text-transparent">
-                            Hackathons
-                        </h2>
-                        <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto px-4">
-                            Carregando experiências em competições...
-                        </p>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 md:gap-8">
-                        {[1, 2, 3].map((i) => (
-                            <div
-                                key={i}
-                                className="bg-gray-800/50 border border-gray-700 rounded-lg p-6 animate-pulse"
-                            >
-                                <div className="w-full h-48 md:h-56 bg-gray-700 rounded-lg mb-4" />
-                                <div className="h-6 bg-gray-700 rounded mb-2" />
-                                <div className="h-4 bg-gray-700 rounded w-1/2" />
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </section>
-        );
+  useEffect(() => {
+    const fetchHackathons = async () => {
+      try {
+        const data = await getHackathons()
+        setHackathons(data)
+      } catch (error) {
+        console.error("Error fetching hackathons:", error)
+      } finally {
+        setLoading(false)
+      }
     }
 
-    if (hackathons.length === 0) {
-        return (
-            <section className="py-16 md:py-20 bg-gray-900">
-                <div className="container mx-auto px-0">
-                    <div className="text-center mb-12 md:mb-16">
-                        <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 bg-gradient-to-r from-purple-400 to-purple-600 bg-clip-text text-transparent">
-                            Hackathons
-                        </h2>
-                        <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto px-4">
-                            Nenhum hackathon encontrado no momento.
-                        </p>
-                    </div>
-                </div>
-            </section>
-        );
+    fetchHackathons()
+  }, [])
+
+  const getPlacementColor = (type: string) => {
+    switch (type) {
+      case "winner":
+        return "bg-yellow-500/80 text-yellow-100 border-yellow-400/80 hover:bg-yellow-400/90"
+      case "finalist":
+        return "bg-blue-500/80 text-blue-100 border-blue-400/80 hover:bg-blue-400/90"
+      default:
+        return "bg-purple-500/80 text-purple-100 border-purple-400/80 hover:bg-purple-400/90"
+    }
+  }
+
+  // Modal management with enhanced state handling
+  const openModal = useCallback((hackathon: Hackathon) => {
+    setSelectedHackathon(hackathon)
+    setCurrentPhotoIndex(0)
+  }, [])
+
+  const closeModal = useCallback(() => {
+    if (!fullScreenImage) {
+      setSelectedHackathon(null)
+      setCurrentPhotoIndex(0)
+    }
+  }, [fullScreenImage])
+
+  const forceCloseModal = useCallback(() => {
+    setSelectedHackathon(null)
+    setCurrentPhotoIndex(0)
+    setFullScreenImage(null)
+  }, [])
+
+  // Photo navigation with enhanced mobile support
+  const nextPhoto = useCallback(() => {
+    if (selectedHackathon && selectedHackathon.photos.length > 1 && !fullScreenImage) {
+      setCurrentPhotoIndex((prev) => (prev + 1) % selectedHackathon.photos.length)
+    }
+  }, [selectedHackathon, fullScreenImage])
+
+  const prevPhoto = useCallback(() => {
+    if (selectedHackathon && selectedHackathon.photos.length > 1 && !fullScreenImage) {
+      setCurrentPhotoIndex((prev) => (prev - 1 + selectedHackathon.photos.length) % selectedHackathon.photos.length)
+    }
+  }, [selectedHackathon, fullScreenImage])
+
+  // Enhanced full-screen image handling
+  const openFullScreenImage = useCallback(() => {
+    if (selectedHackathon && selectedHackathon.photos[currentPhotoIndex]) {
+      const photo = selectedHackathon.photos[currentPhotoIndex]
+      setFullScreenImage({
+        url: photo.url,
+        alt: photo.alt,
+      })
+    }
+  }, [selectedHackathon, currentPhotoIndex])
+
+  const closeFullScreenImage = useCallback(() => {
+    setFullScreenImage(null)
+  }, [])
+
+  // Enhanced keyboard navigation
+  useEffect(() => {
+    if (!selectedHackathon || fullScreenImage) return
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      switch (event.key) {
+        case "ArrowLeft":
+          event.preventDefault()
+          prevPhoto()
+          break
+        case "ArrowRight":
+          event.preventDefault()
+          nextPhoto()
+          break
+        case "Escape":
+          event.preventDefault()
+          closeModal()
+          break
+      }
     }
 
+    document.addEventListener("keydown", handleKeyDown, { passive: false })
+    return () => document.removeEventListener("keydown", handleKeyDown)
+  }, [selectedHackathon, fullScreenImage, prevPhoto, nextPhoto, closeModal])
+
+  // Enhanced modal dialog handling
+  const handleModalOpenChange = useCallback(
+    (open: boolean) => {
+      if (!open) {
+        if (fullScreenImage) {
+          setFullScreenImage(null)
+        } else {
+          forceCloseModal()
+        }
+      }
+    },
+    [fullScreenImage, forceCloseModal],
+  )
+
+  // Enhanced image expand handler with comprehensive mobile support
+  const handleImageExpand = useCallback(
+    (event: React.MouseEvent | React.TouchEvent) => {
+      if (fullScreenImage) return
+
+      event.preventDefault()
+      event.stopPropagation()
+
+      // Use requestAnimationFrame for smooth transition
+      requestAnimationFrame(() => {
+        openFullScreenImage()
+      })
+    },
+    [fullScreenImage, openFullScreenImage],
+  )
+
+  // Enhanced navigation button handler
+  const handleNavigation = useCallback(
+    (direction: "prev" | "next", event: React.MouseEvent | React.TouchEvent) => {
+      event.preventDefault()
+      event.stopPropagation()
+
+      if (direction === "prev") {
+        prevPhoto()
+      } else {
+        nextPhoto()
+      }
+    },
+    [prevPhoto, nextPhoto],
+  )
+
+  // Enhanced photo indicator handler
+  const handlePhotoIndicator = useCallback(
+    (index: number, event: React.MouseEvent | React.TouchEvent) => {
+      if (fullScreenImage) return
+
+      event.preventDefault()
+      event.stopPropagation()
+      setCurrentPhotoIndex(index)
+    },
+    [fullScreenImage],
+  )
+
+  if (loading) {
     return (
-        <>
-            <section className="py-16 md:py-20 bg-gray-900 relative overflow-hidden">
-                {/* Background elements */}
-                <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                    <div className="absolute top-20 left-20 w-64 h-64 bg-yellow-500/5 rounded-full blur-3xl animate-pulse" />
-                    <div className="absolute bottom-20 right-20 w-96 h-96 bg-purple-600/3 rounded-full blur-3xl animate-pulse delay-1000" />
-                </div>
+      <section className="py-16 md:py-20 bg-gray-900">
+        <div className="container mx-auto px-0">
+          <div className="text-center mb-12 md:mb-16">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 bg-gradient-to-r from-purple-400 to-purple-600 bg-clip-text text-transparent">
+              Hackathons
+            </h2>
+            <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto px-4">
+              Carregando experiências em competições...
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 md:gap-8">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="bg-gray-800/50 border border-gray-700 rounded-lg p-6 animate-pulse">
+                <div className="w-full h-48 md:h-56 bg-gray-700 rounded-lg mb-4" />
+                <div className="h-6 bg-gray-700 rounded mb-2" />
+                <div className="h-4 bg-gray-700 rounded w-1/2" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    )
+  }
 
-                <div className="container mx-auto px-0 relative z-10">
-                    <div className="text-center mb-12 md:mb-16">
-                        <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 bg-gradient-to-r from-purple-400 to-purple-600 bg-clip-text text-transparent">
-                            Hackathons
-                        </h2>
-                        <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto px-4">
-                            Experiências em competições de programação,
-                            desenvolvendo soluções inovadoras em tempo limitado.
-                        </p>
+  if (hackathons.length === 0) {
+    return (
+      <section className="py-16 md:py-20 bg-gray-900">
+        <div className="container mx-auto px-0">
+          <div className="text-center mb-12 md:mb-16">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 bg-gradient-to-r from-purple-400 to-purple-600 bg-clip-text text-transparent">
+              Hackathons
+            </h2>
+            <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto px-4">
+              Nenhum hackathon encontrado no momento.
+            </p>
+          </div>
+        </div>
+      </section>
+    )
+  }
 
-                        <div className="flex items-center justify-center gap-2 mt-6 text-sm text-gray-400">
-                            <MousePointer className="w-4 h-4" />
-                            <span>
-                                Clique nos cards para ver mais detalhes e fotos
-                            </span>
-                        </div>
-                    </div>
+  return (
+    <>
+      <section className="py-16 md:py-20 bg-gray-900 relative overflow-hidden">
+        {/* Background elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-20 left-20 w-64 h-64 bg-yellow-500/5 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute bottom-20 right-20 w-96 h-96 bg-purple-600/3 rounded-full blur-3xl animate-pulse delay-1000" />
+        </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 md:gap-8">
-                        {hackathons.map((hackathon, index) => (
-                            <Card
-                                key={hackathon.id}
-                                className={`
+        <div className="container mx-auto px-0 relative z-10">
+          <div className="text-center mb-12 md:mb-16">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 bg-gradient-to-r from-purple-400 to-purple-600 bg-clip-text text-transparent">
+              Hackathons
+            </h2>
+            <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto px-4">
+              Experiências em competições de programação, desenvolvendo soluções inovadoras em tempo limitado.
+            </p>
+
+            <div className="flex items-center justify-center gap-2 mt-6 text-sm text-gray-400">
+              <MousePointer className="w-4 h-4" />
+              <span>Clique nos cards para ver mais detalhes e fotos</span>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 md:gap-8">
+            {hackathons.map((hackathon, index) => (
+              <Card
+                key={hackathon.id}
+                className={`
                   group relative overflow-hidden cursor-pointer
                   bg-gray-800/50 border-2 transition-all duration-500 ease-out
                   ${
-                      hoveredCard === hackathon.id
-                          ? "border-purple-500/70 bg-gray-800/80 shadow-2xl shadow-purple-500/20 scale-[1.02]"
-                          : "border-gray-700/50 hover:border-purple-500/50"
+                    hoveredCard === hackathon.id
+                      ? "border-purple-500/70 bg-gray-800/80 shadow-2xl shadow-purple-500/20 scale-[1.02]"
+                      : "border-gray-700/50 hover:border-purple-500/50"
                   }
                   transform hover:scale-[1.02] hover:shadow-2xl hover:shadow-purple-500/10
                 `}
-                                style={{ animationDelay: `${index * 0.1}s` }}
-                                onClick={() => openModal(hackathon)}
-                                onMouseEnter={() =>
-                                    setHoveredCard(hackathon.id)
-                                }
-                                onMouseLeave={() => setHoveredCard(null)}
-                            >
-                                {/* Sparkle effect */}
-                                <div className="absolute top-4 left-4 opacity-0 group-hover:opacity-100 transition-all duration-300 z-40">
-                                    <Sparkles className="w-5 h-5 text-purple-400" />
-                                </div>
+                style={{ animationDelay: `${index * 0.1}s` }}
+                onClick={() => openModal(hackathon)}
+                onMouseEnter={() => setHoveredCard(hackathon.id)}
+                onMouseLeave={() => setHoveredCard(null)}
+              >
+                {/* Sparkle effect */}
+                <div className="absolute top-4 left-4 opacity-0 group-hover:opacity-100 transition-all duration-300 z-40">
+                  <Sparkles className="w-5 h-5 text-purple-400" />
+                </div>
 
-                                {/* Placement badge */}
-                                <Badge
-                                    className={`absolute top-4 right-4 z-40 ${getPlacementColor(
-                                        hackathon.placementType
-                                    )} font-semibold backdrop-blur-sm transition-all duration-300`}
-                                >
-                                    {hackathon.placement}
-                                </Badge>
+                {/* Placement badge */}
+                <Badge
+                  className={`absolute top-4 right-4 z-40 ${getPlacementColor(hackathon.placementType)} font-semibold backdrop-blur-sm transition-all duration-300`}
+                >
+                  {hackathon.placement}
+                </Badge>
 
-                                {/* Click indicator */}
-                                <div className="absolute top-4 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 z-40">
-                                    <div className="bg-gray-900/90 backdrop-blur-sm rounded-full px-3 py-1.5 flex items-center gap-2 border border-purple-500/30">
-                                        <Eye className="w-3 h-3 text-purple-400" />
-                                        <span className="text-xs text-purple-300 font-medium">
-                                            Ver detalhes
-                                        </span>
-                                    </div>
-                                </div>
+                {/* Click indicator */}
+                <div className="absolute top-4 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 z-40">
+                  <div className="bg-gray-900/90 backdrop-blur-sm rounded-full px-3 py-1.5 flex items-center gap-2 border border-purple-500/30">
+                    <Eye className="w-3 h-3 text-purple-400" />
+                    <span className="text-xs text-purple-300 font-medium">Ver detalhes</span>
+                  </div>
+                </div>
 
-                                <CardHeader className="pb-4 relative z-10">
-                                    <div className="w-full h-48 md:h-56 bg-gradient-to-br from-purple-900/20 to-gray-800 rounded-lg mb-4 overflow-hidden relative group/image">
-                                        <div className="w-full h-full relative">
-                                            <Image
-                                                src={
-                                                    hackathon.coverImage ||
-                                                    "/placeholder.svg"
-                                                }
-                                                alt={hackathon.title}
-                                                fill
-                                                className="object-cover transition-all duration-700 group-hover:scale-110"
-                                                loading="lazy"
-                                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                                            />
+                <CardHeader className="pb-4 relative z-10">
+                  <div className="w-full h-48 md:h-56 bg-gradient-to-br from-purple-900/20 to-gray-800 rounded-lg mb-4 overflow-hidden relative group/image">
+                    <div className="w-full h-full relative">
+                      <Image
+                        src={hackathon.coverImage || "/placeholder.svg"}
+                        alt={hackathon.title}
+                        fill
+                        className="object-cover transition-all duration-700 group-hover:scale-110"
+                        loading="lazy"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      />
 
-                                            {/* Photo count indicator */}
-                                            {hackathon.photos.length > 0 && (
-                                                <div className="absolute bottom-3 right-3 bg-gray-900/80 backdrop-blur-sm rounded-full px-2 py-1 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all duration-300">
-                                                    <div className="w-2 h-2 bg-purple-400 rounded-full" />
-                                                    <span className="text-xs text-white font-medium">
-                                                        {
-                                                            hackathon.photos
-                                                                .length
-                                                        }{" "}
-                                                        fotos
-                                                    </span>
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
+                      {/* Photo count indicator */}
+                      {hackathon.photos.length > 0 && (
+                        <div className="absolute bottom-3 right-3 bg-gray-900/80 backdrop-blur-sm rounded-full px-2 py-1 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all duration-300">
+                          <div className="w-2 h-2 bg-purple-400 rounded-full" />
+                          <span className="text-xs text-white font-medium">{hackathon.photos.length} fotos</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
 
-                                    <CardTitle className="text-white text-lg md:text-xl line-clamp-2 group-hover:text-purple-300 transition-colors duration-300">
-                                        {hackathon.title}
-                                    </CardTitle>
+                  <CardTitle className="text-white text-lg md:text-xl line-clamp-2 group-hover:text-purple-300 transition-colors duration-300">
+                    {hackathon.title}
+                  </CardTitle>
 
-                                    <div className="flex items-center gap-2 text-gray-400 text-sm group-hover:text-gray-300 transition-colors duration-300">
-                                        <Calendar className="w-4 h-4 text-purple-400" />
-                                        <span>{hackathon.date}</span>
-                                    </div>
-                                </CardHeader>
+                  <div className="flex items-center gap-2 text-gray-400 text-sm group-hover:text-gray-300 transition-colors duration-300">
+                    <Calendar className="w-4 h-4 text-purple-400" />
+                    <span>{hackathon.date}</span>
+                  </div>
+                </CardHeader>
 
-                                <CardContent className="pt-0 relative z-10">
-                                    <p className="text-gray-400 text-sm line-clamp-2 group-hover:text-gray-300 transition-colors duration-300">
-                                        {hackathon.description}
-                                    </p>
+                <CardContent className="pt-0 relative z-10">
+                  <p className="text-gray-400 text-sm line-clamp-2 group-hover:text-gray-300 transition-colors duration-300">
+                    {hackathon.description}
+                  </p>
 
-                                    <div className="mt-4 flex items-center justify-between">
-                                        <div className="flex items-center gap-2 text-xs text-gray-500 group-hover:text-purple-400 transition-colors duration-300">
-                                            <Trophy className="w-3 h-3" />
-                                            <span>Competição</span>
-                                        </div>
-
-                                        <div className="opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0">
-                                            <div className="flex items-center gap-1 text-xs text-purple-400 font-medium">
-                                                <span>
-                                                    Clique para explorar
-                                                </span>
-                                                <ChevronRight className="w-3 h-3" />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        ))}
+                  <div className="mt-4 flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-xs text-gray-500 group-hover:text-purple-400 transition-colors duration-300">
+                      <Trophy className="w-3 h-3" />
+                      <span>Competição</span>
                     </div>
 
-                    {/* Hackathon Details Modal - Standard z-index */}
-                    <Dialog
-                        open={!!selectedHackathon}
-                        onOpenChange={handleModalOpenChange}
-                    >
-                        <DialogContent
-                            className="max-w-4xl max-h-[90vh] overflow-y-auto bg-gray-800 border-gray-700 text-white"
-                            style={{ zIndex: 50 }} // Standard modal z-index
-                        >
-                            <DialogHeader>
-                                <DialogTitle className="text-2xl font-bold text-white pr-8">
-                                    {selectedHackathon?.title}
-                                </DialogTitle>
-                                <div className="flex items-center gap-2 text-gray-400">
-                                    <Calendar className="w-4 h-4" />
-                                    <span>{selectedHackathon?.date}</span>
-                                </div>
-                            </DialogHeader>
+                    <div className="opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0">
+                      <div className="flex items-center gap-1 text-xs text-purple-400 font-medium">
+                        <span>Clique para explorar</span>
+                        <ChevronRight className="w-3 h-3" />
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
 
-                            {selectedHackathon && (
-                                <div className="space-y-6">
-                                    {/* Result highlight */}
-                                    <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-purple-900/30 to-purple-800/30 rounded-lg border border-purple-500/30">
-                                        <Trophy className="w-6 h-6 text-yellow-400" />
-                                        <div>
-                                            <span className="text-gray-300">
-                                                Resultado:{" "}
-                                            </span>
-                                            <span className="font-semibold text-white">
-                                                {selectedHackathon.placement}
-                                            </span>
-                                        </div>
-                                    </div>
-
-                                    {/* Cover image */}
-                                    <div className="w-full h-64 md:h-80 rounded-lg overflow-hidden">
-                                        <Image
-                                            src={
-                                                selectedHackathon.coverImage ||
-                                                "/placeholder.svg"
-                                            }
-                                            alt={selectedHackathon.title}
-                                            width={800}
-                                            height={400}
-                                            className="w-full h-full object-cover"
-                                            priority
-                                        />
-                                    </div>
-
-                                    {/* Description */}
-                                    <div>
-                                        <h3 className="text-xl font-semibold mb-3 text-white">
-                                            Sobre o Projeto
-                                        </h3>
-                                        <p className="text-gray-300 leading-relaxed">
-                                            {selectedHackathon.description}
-                                        </p>
-                                    </div>
-
-                                    {/* Photo carousel */}
-                                    {selectedHackathon.photos.length > 0 && (
-                                        <div>
-                                            <h3 className="text-xl font-semibold mb-4 text-white">
-                                                Galeria de Fotos
-                                            </h3>
-                                            <div className="relative">
-                                                <div className="w-full h-64 md:h-80 rounded-lg overflow-hidden bg-gray-900 relative group">
-                                                    {/* Main image with enhanced click/touch to expand */}
-                                                    <div
-                                                        className={`w-full h-full relative ${
-                                                            fullScreenImage ? "cursor-default" : "cursor-pointer"
-                                                        }`}
-                                                        onClick={handleImageExpand}
-                                                        onTouchEnd={handleImageExpand}
-                                                        style={{
-                                                            touchAction: "manipulation",
-                                                            WebkitTapHighlightColor: "transparent",
-                                                            WebkitUserSelect: "none",
-                                                            userSelect: "none",
-                                                        }}
-                                                    >
-                                                        <Image
-                                                            src={
-                                                                selectedHackathon.photos[currentPhotoIndex]?.url ||
-                                                                "/placeholder.svg"
-                                                            }
-                                                            alt={
-                                                                selectedHackathon.photos[currentPhotoIndex]?.alt ||
-                                                                "Hackathon photo"
-                                                            }
-                                                            width={800}
-                                                            height={400}
-                                                            className={`w-full h-full object-cover transition-transform duration-300 ${
-                                                                fullScreenImage ? "" : "group-hover:scale-105"
-                                                            }`}
-                                                            loading="lazy"
-                                                            style={{
-                                                                userSelect: "none",
-                                                                WebkitUserSelect: "none",
-                                                                WebkitTouchCallout: "none",
-                                                            }}
-                                                            draggable={false}
-                                                        />
-
-                                                        {/* Rest of the image container content remains the same */}
-                                                        {!fullScreenImage && (
-                                                            <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                                                <div className="bg-gray-900/80 backdrop-blur-sm rounded-full p-2">
-                                                                    <Maximize2 className="w-4 h-4 text-white" />
-                                                                </div>
-                                                            </div>
-                                                        )}
-
-                                                        {!fullScreenImage && (
-                                                            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/20">
-                                                                <div className="bg-gray-900/90 backdrop-blur-sm rounded-full px-4 py-2 flex items-center gap-2">
-                                                                    <Maximize2 className="w-4 h-4 text-white" />
-                                                                    <span className="text-white text-sm font-medium">
-                                                                        <span className="hidden sm:inline">Clique para expandir</span>
-                                                                        <span className="sm:hidden">Toque para expandir</span>
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-                                                        )}
-                                                    </div>
-
-                                                    {/* Navigation buttons with enhanced mobile support */}
-                                                    {selectedHackathon.photos
-                                                        .length > 1 && (
-                                                        <>
-                                                            <Button
-                                                                variant="outline"
-                                                                size="icon"
-                                                                className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-gray-900/80 border-gray-600 hover:bg-gray-800 active:scale-95"
-                                                                onClick={(
-                                                                    e
-                                                                ) => {
-                                                                    e.stopPropagation();
-                                                                    prevPhoto();
-                                                                }}
-                                                                onTouchEnd={(
-                                                                    e
-                                                                ) => {
-                                                                    e.stopPropagation();
-                                                                    prevPhoto();
-                                                                }}
-                                                                disabled={
-                                                                    !!fullScreenImage
-                                                                }
-                                                                style={{
-                                                                    touchAction:
-                                                                        "manipulation",
-                                                                }}
-                                                            >
-                                                                <ChevronLeft className="w-4 h-4" />
-                                                            </Button>
-                                                            <Button
-                                                                variant="outline"
-                                                                size="icon"
-                                                                className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-gray-900/80 border-gray-600 hover:bg-gray-800 active:scale-95"
-                                                                onClick={(
-                                                                    e
-                                                                ) => {
-                                                                    e.stopPropagation();
-                                                                    nextPhoto();
-                                                                }}
-                                                                onTouchEnd={(
-                                                                    e
-                                                                ) => {
-                                                                    e.stopPropagation();
-                                                                    nextPhoto();
-                                                                }}
-                                                                disabled={
-                                                                    !!fullScreenImage
-                                                                }
-                                                                style={{
-                                                                    touchAction:
-                                                                        "manipulation",
-                                                                }}
-                                                            >
-                                                                <ChevronRight className="w-4 h-4" />
-                                                            </Button>
-                                                        </>
-                                                    )}
-                                                </div>
-
-                                                {/* Photo indicators with enhanced mobile support */}
-                                                {selectedHackathon.photos
-                                                    .length > 1 && (
-                                                    <div className="flex justify-center gap-2 mt-4">
-                                                        {selectedHackathon.photos.map(
-                                                            (_, index) => (
-                                                                <button
-                                                                    key={index}
-                                                                    className={`w-2 h-2 rounded-full transition-colors active:scale-95 ${
-                                                                        index ===
-                                                                        currentPhotoIndex
-                                                                            ? "bg-purple-500"
-                                                                            : "bg-gray-600"
-                                                                    } ${
-                                                                        fullScreenImage
-                                                                            ? "cursor-default"
-                                                                            : "cursor-pointer"
-                                                                    }`}
-                                                                    onClick={
-                                                                        fullScreenImage
-                                                                            ? undefined
-                                                                            : () =>
-                                                                                  setCurrentPhotoIndex(
-                                                                                      index
-                                                                                  )
-                                                                    }
-                                                                    onTouchEnd={
-                                                                        fullScreenImage
-                                                                            ? undefined
-                                                                            : () =>
-                                                                                  setCurrentPhotoIndex(
-                                                                                      index
-                                                                                  )
-                                                                    }
-                                                                    disabled={
-                                                                        !!fullScreenImage
-                                                                    }
-                                                                    aria-label={`Go to photo ${
-                                                                        index +
-                                                                        1
-                                                                    }`}
-                                                                    style={{
-                                                                        touchAction:
-                                                                            "manipulation",
-                                                                    }}
-                                                                />
-                                                            )
-                                                        )}
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                            )}
-                        </DialogContent>
-                    </Dialog>
-
-                    {/* Full-screen image viewer - Highest z-index with portal */}
-                    {fullScreenImage && (
-                        <FullScreenImageViewer
-                            imageUrl={fullScreenImage.url}
-                            imageAlt={fullScreenImage.alt}
-                            onClose={closeFullScreenImage}
-                        />
-                    )}
+          {/* Enhanced Hackathon Details Modal */}
+          <Dialog open={!!selectedHackathon} onOpenChange={handleModalOpenChange}>
+            <DialogContent
+              className="max-w-4xl max-h-[90vh] overflow-y-auto bg-gray-800 border-gray-700 text-white"
+              style={{ zIndex: 50 }}
+            >
+              <DialogHeader>
+                <DialogTitle className="text-2xl font-bold text-white pr-8">{selectedHackathon?.title}</DialogTitle>
+                <div className="flex items-center gap-2 text-gray-400">
+                  <Calendar className="w-4 h-4" />
+                  <span>{selectedHackathon?.date}</span>
                 </div>
-            </section>
-        </>
-    );
+              </DialogHeader>
+
+              {selectedHackathon && (
+                <div className="space-y-6">
+                  {/* Result highlight */}
+                  <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-purple-900/30 to-purple-800/30 rounded-lg border border-purple-500/30">
+                    <Trophy className="w-6 h-6 text-yellow-400" />
+                    <div>
+                      <span className="text-gray-300">Resultado: </span>
+                      <span className="font-semibold text-white">{selectedHackathon.placement}</span>
+                    </div>
+                  </div>
+
+                  {/* Cover image */}
+                  <div className="w-full h-64 md:h-80 rounded-lg overflow-hidden">
+                    <Image
+                      src={selectedHackathon.coverImage || "/placeholder.svg"}
+                      alt={selectedHackathon.title}
+                      width={800}
+                      height={400}
+                      className="w-full h-full object-cover"
+                      priority
+                    />
+                  </div>
+
+                  {/* Description */}
+                  <div>
+                    <h3 className="text-xl font-semibold mb-3 text-white">Sobre o Projeto</h3>
+                    <p className="text-gray-300 leading-relaxed">{selectedHackathon.description}</p>
+                  </div>
+
+                  {/* Enhanced photo carousel */}
+                  {selectedHackathon.photos.length > 0 && (
+                    <div>
+                      <h3 className="text-xl font-semibold mb-4 text-white">Galeria de Fotos</h3>
+                      <div className="relative">
+                        <div className="w-full h-64 md:h-80 rounded-lg overflow-hidden bg-gray-900 relative group">
+                          {/* Enhanced main image with comprehensive mobile support */}
+                          <div
+                            className={`w-full h-full relative ${fullScreenImage ? "cursor-default" : "cursor-pointer"}`}
+                            onClick={handleImageExpand}
+                            onTouchEnd={handleImageExpand}
+                            onTouchStart={(e) => {
+                              if (!fullScreenImage) {
+                                e.preventDefault()
+                              }
+                            }}
+                            style={{
+                              touchAction: fullScreenImage ? "none" : "manipulation",
+                              WebkitTapHighlightColor: "transparent",
+                            }}
+                          >
+                            <Image
+                              src={selectedHackathon.photos[currentPhotoIndex]?.url || "/placeholder.svg"}
+                              alt={selectedHackathon.photos[currentPhotoIndex]?.alt || "Hackathon photo"}
+                              width={800}
+                              height={400}
+                              className={`w-full h-full object-cover transition-transform duration-300 ${
+                                fullScreenImage ? "" : "group-hover:scale-105"
+                              }`}
+                              loading="lazy"
+                            />
+
+                            {/* Expand indicator */}
+                            {!fullScreenImage && (
+                              <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                <div className="bg-gray-900/80 backdrop-blur-sm rounded-full p-2">
+                                  <Maximize2 className="w-4 h-4 text-white" />
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Click hint */}
+                            {!fullScreenImage && (
+                              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/20">
+                                <div className="bg-gray-900/90 backdrop-blur-sm rounded-full px-4 py-2 flex items-center gap-2">
+                                  <Maximize2 className="w-4 h-4 text-white" />
+                                  <span className="text-white text-sm font-medium">
+                                    <span className="hidden sm:inline">Clique para expandir</span>
+                                    <span className="sm:hidden">Toque para expandir</span>
+                                  </span>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Enhanced navigation buttons */}
+                          {selectedHackathon.photos.length > 1 && (
+                            <>
+                              <Button
+                                variant="outline"
+                                size="icon"
+                                className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-gray-900/80 border-gray-600 hover:bg-gray-800 active:scale-95"
+                                onClick={(e) => handleNavigation("prev", e)}
+                                onTouchEnd={(e) => handleNavigation("prev", e)}
+                                onTouchStart={(e) => e.preventDefault()}
+                                disabled={!!fullScreenImage}
+                                style={{
+                                  touchAction: "manipulation",
+                                  WebkitTapHighlightColor: "transparent",
+                                }}
+                              >
+                                <ChevronLeft className="w-4 h-4" />
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="icon"
+                                className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-gray-900/80 border-gray-600 hover:bg-gray-800 active:scale-95"
+                                onClick={(e) => handleNavigation("next", e)}
+                                onTouchEnd={(e) => handleNavigation("next", e)}
+                                onTouchStart={(e) => e.preventDefault()}
+                                disabled={!!fullScreenImage}
+                                style={{
+                                  touchAction: "manipulation",
+                                  WebkitTapHighlightColor: "transparent",
+                                }}
+                              >
+                                <ChevronRight className="w-4 h-4" />
+                              </Button>
+                            </>
+                          )}
+                        </div>
+
+                        {/* Enhanced photo indicators */}
+                        {selectedHackathon.photos.length > 1 && (
+                          <div className="flex justify-center gap-2 mt-4">
+                            {selectedHackathon.photos.map((_, index) => (
+                              <button
+                                key={index}
+                                className={`w-2 h-2 rounded-full transition-colors active:scale-95 ${
+                                  index === currentPhotoIndex ? "bg-purple-500" : "bg-gray-600"
+                                } ${fullScreenImage ? "cursor-default" : "cursor-pointer"}`}
+                                onClick={(e) => handlePhotoIndicator(index, e)}
+                                onTouchEnd={(e) => handlePhotoIndicator(index, e)}
+                                onTouchStart={(e) => {
+                                  if (!fullScreenImage) {
+                                    e.preventDefault()
+                                  }
+                                }}
+                                disabled={!!fullScreenImage}
+                                aria-label={`Go to photo ${index + 1}`}
+                                style={{
+                                  touchAction: "manipulation",
+                                  WebkitTapHighlightColor: "transparent",
+                                }}
+                              />
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </DialogContent>
+          </Dialog>
+
+          {/* Enhanced full-screen image viewer */}
+          {fullScreenImage && (
+            <FullScreenImageViewer
+              imageUrl={fullScreenImage.url}
+              imageAlt={fullScreenImage.alt}
+              onClose={closeFullScreenImage}
+            />
+          )}
+        </div>
+      </section>
+    </>
+  )
 }

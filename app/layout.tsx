@@ -70,6 +70,37 @@ export default function RootLayout({
 }) {
     return (
         <html lang="pt-br" className="scroll-smooth">
+            <head>
+                <script
+                    type="application/ld+json"
+                    dangerouslySetInnerHTML={{
+                        __html: JSON.stringify({
+                            "@context": "https://schema.org",
+                            "@graph": [
+                                {
+                                    "@type": "Person",
+                                    "name": "José Hernanes",
+                                    "url": "https://devjoseh.com.br",
+                                    "sameAs": [
+                                        "https://github.com/devjoseh",
+                                        "https://www.linkedin.com/in/devjoseh/"
+                                    ]
+                                },
+                                {
+                                    "@type": "WebSite",
+                                    "name": "DevJoseH - Portfólio Desenvolvedor Backend",
+                                    "url": "https://devjoseh.com.br",
+                                    "publisher": {
+                                        "@id": "https://devjoseh.com.br/#person"
+                                    },
+                                    "inLanguage": "pt-BR",
+                                    "description": "Portfolio pessoal de José Hernanes, desenvolvedor back-end e entusiasta de tecnologia."
+                                }
+                            ]
+                        })
+                    }}
+                />
+            </head>
             <body className={inter.className}>{children}</body>
         </html>
     );

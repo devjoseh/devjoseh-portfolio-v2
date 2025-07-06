@@ -24,9 +24,18 @@ export const metadata: Metadata = {
         "discord",
         "discordjs",
     ],
+    authors: [{ name: "DevJoseH" }, { name: "José Hernanes" }],
+    creator: "DevJoseH José Hernanes",
+    publisher: "DevJoseH",
+    formatDetection: {
+        email: false,
+        address: false,
+        telephone: false
+    },
     metadataBase: new URL("https://devjoseh.com.br"),
-    creator: "DevJoseH",
-    authors: [{ name: "DevJoseH" }],
+    alternates: {
+        canonical: "/",
+    },
     openGraph: {
         title: "DevJoseH - Portfólio Desenvolvedor Backend",
         description: "Portfolio pessoal de José Hernanes, desenvolvedor back-end e entusiasta de tecnologia.",
@@ -39,8 +48,8 @@ export const metadata: Metadata = {
                 height: 630,
             },
         ],
-        type: "website",
         locale: "pt_BR",
+        type: "website",
     },
     twitter: {
         card: "summary_large_image",

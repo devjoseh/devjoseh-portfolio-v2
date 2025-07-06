@@ -5,6 +5,7 @@ export * from "./sections/landing/experience";
 export * from "./sections/landing/footer";
 export * from "./sections/landing/hackathons";
 export * from "./sections/landing/hero";
+export * from "./sections/landing/links-cta";
 export * from "./sections/landing/links";
 export * from "./sections/landing/navigation";
 export * from "./sections/landing/projects";

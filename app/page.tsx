@@ -1,4 +1,4 @@
-import { QuoteSection, AboutSection, HeroSection, Navigation, Footer, SkillsToolsSection, ExperienceSection, ProjectsSection, HackathonsSection } from "@/components/index";
+import { QuoteSection, AboutSection, HeroSection, Navigation, Footer, SkillsToolsSection, ExperienceSection, ProjectsSection, HackathonsSection, LinksCTASection } from "@/components/index";
  
 export default function Home() {
     return (
@@ -18,6 +18,7 @@ export default function Home() {
                 <div id="projects">
                     <ProjectsSection />
                 </div>
+                <LinksCTASection />
                 <div id="hackathons">
                     <HackathonsSection />
                 </div>

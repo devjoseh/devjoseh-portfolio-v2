@@ -5,6 +5,7 @@ import { Linkedin, Instagram, Youtube, Github, ExternalLink } from "lucide-react
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
+import Link from "next/link";
 
 export function AboutSection() {
     const socialLinks = [
@@ -17,13 +18,13 @@ export function AboutSection() {
         {
             name: "Instagram",
             icon: Instagram,
-            url: "http://instagram.com/dev_joseh",
+            url: "https://instagram.com/dev_joseh",
             color: "hover:bg-pink-600/10 hover:border-pink-500",
         },
         {
             name: "YouTube",
             icon: Youtube,
-            url: "http://youtube.com/@devjoseh",
+            url: "https://youtube.com/@devjoseh",
             color: "hover:bg-red-600/10 hover:border-red-500",
         },
         {
@@ -45,13 +46,6 @@ export function AboutSection() {
         "Resolução de problemas lógicos",
         "Intelectualmente Estimulante",
     ];
-
-    const handlePersonalityClick = () => {
-        window.open(
-            "https://www.16personalities.com/br/personalidade-entj",
-            "_blank"
-        );
-    };
 
     return (
         <section className="py-16 md:py-20 bg-gradient-to-b from-gray-900 via-gray-900 to-gray-900/95 relative overflow-hidden">
@@ -93,19 +87,21 @@ export function AboutSection() {
                         {/* Social Links */}
                         <div className="grid grid-cols-2 gap-3 max-w-sm mx-auto lg:mx-0">
                             {socialLinks.map((social) => (
-                                <Button
+                                <Link
                                     key={social.name}
-                                    variant="outline"
-                                    className={`border-gray-600 bg-gray-800/50 text-gray-300 transition-all duration-300 ${social.color} flex items-center gap-2 justify-start px-4 py-3 h-auto backdrop-blur-sm`}
-                                    onClick={() =>
-                                        window.open(social.url, "_blank")
-                                    }
+                                    href={social.url}
+                                    target="_blank"
                                 >
-                                    <social.icon className="w-4 h-4" />
-                                    <span className="text-sm font-medium">
-                                        {social.name}
-                                    </span>
-                                </Button>
+                                    <Button
+                                        variant="outline"
+                                        className={`border-gray-600 bg-gray-800/50 text-gray-300 transition-all duration-300 ${social.color} flex items-center gap-2 justify-start px-4 py-3 h-auto backdrop-blur-sm`}
+                                    >
+                                        <social.icon className="w-4 h-4" />
+                                        <span className="text-sm font-medium">
+                                            {social.name}
+                                        </span>
+                                    </Button>
+                                </Link>
                             ))}
                         </div>
 
@@ -141,26 +137,30 @@ export function AboutSection() {
                         <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
                             <CardHeader>
                                 <div className="flex items-center gap-4">
-                                    <div
-                                        className="p-2 w-16 h-16 rounded-full bg-white flex items-center justify-center cursor-pointer transition-transform hover:scale-105 overflow-hidden"
-                                        onClick={handlePersonalityClick}
+                                    <Link
+                                        href="https://www.16personalities.com/br/personalidade-entj"
+                                        target="_blank"
                                     >
-                                        <Image
-                                            src="/logo_16personalities.svg?height=64&width=64"
-                                            alt="16Personalities Logo"
-                                            width={64}
-                                            height={64}
-                                            className="w-full h-full object-cover"
-                                        />
-                                    </div>
+                                        <div className="p-2 w-16 h-16 rounded-full bg-white flex items-center justify-center cursor-pointer transition-transform hover:scale-105 overflow-hidden">
+                                            <Image
+                                                src="/logo_16personalities.svg?height=64&width=64"
+                                                alt="16Personalities Logo"
+                                                width={64}
+                                                height={64}
+                                                className="w-full h-full object-cover"
+                                            />
+                                        </div>
+                                    </Link>
                                     <div>
-                                        <CardTitle
-                                            className="text-white text-xl cursor-pointer hover:text-purple-400 transition-colors flex items-center gap-2"
-                                            onClick={handlePersonalityClick}
+                                        <Link
+                                            href="https://www.16personalities.com/br/personalidade-entj"
+                                            target="_blank"
                                         >
-                                            Comandante (ENTJ-T)
-                                            <ExternalLink className="w-4 h-4" />
-                                        </CardTitle>
+                                            <CardTitle className="text-white text-xl cursor-pointer hover:text-purple-400 transition-colors flex items-center gap-2">
+                                                Comandante (ENTJ-T)
+                                                <ExternalLink className="w-4 h-4" />
+                                            </CardTitle>
+                                        </Link>
                                         <CardDescription className="text-gray-400">
                                             16Personalities
                                         </CardDescription>
@@ -171,12 +171,13 @@ export function AboutSection() {
                                 <p className="text-gray-300 text-sm md:text-base leading-relaxed">
                                     Realizei o teste de personalidade
                                     16Personalities e obtive o resultado{" "}
-                                    <button
-                                        onClick={handlePersonalityClick}
+                                    <Link
+                                        href="https://www.16personalities.com/br/personalidade-entj"
+                                        target="_blank"
                                         className="text-purple-400 hover:text-purple-300 underline decoration-purple-400/50 hover:decoration-purple-300 transition-colors font-medium"
                                     >
                                         ENTJ-T (Comandante)
-                                    </button>
+                                    </Link>
                                     . Esse perfil destaca minha liderança,
                                     pensamento estratégico e foco em resultados,
                                     características que impulsionam meu

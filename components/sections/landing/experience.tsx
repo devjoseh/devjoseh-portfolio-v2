@@ -7,6 +7,7 @@ import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
+import Link from "next/link";
 
 interface Experience {
     id: string;
@@ -62,10 +63,6 @@ export function ExperienceSection() {
             year: "numeric",
             month: "short",
         });
-    };
-
-    const handleGitHubClick = () => {
-        window.open("https://github.com/devjoseh?tab=repositories", "_blank");
     };
 
     return (
@@ -236,13 +233,17 @@ export function ExperienceSection() {
 
                                 {/* Button - Right */}
                                 <div className="flex-shrink-0">
-                                    <Button
-                                        onClick={handleGitHubClick}
-                                        className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-6 py-3 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-purple-500/25 group"
+                                    <Link
+                                        href="https://github.com/devjoseh?tab=repositories"
+                                        target="_blank"
                                     >
-                                        Ver Repositórios
-                                        <ExternalLink className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
-                                    </Button>
+                                        <Button
+                                            className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-6 py-3 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-purple-500/25 group"
+                                        >
+                                            Ver Repositórios
+                                            <ExternalLink className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
+                                        </Button>
+                                    </Link>
                                 </div>
                             </div>
                         </CardContent>

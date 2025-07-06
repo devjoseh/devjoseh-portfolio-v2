@@ -17,6 +17,7 @@ import type React from "react";
 import Image from "next/image";
 
 import type { Projects as Project } from "@/utils/supabase/types" 
+import Link from "next/link";
 
 interface ProjectManagerProps {
     initialProjects: Project[];
@@ -377,36 +378,34 @@ export function ProjectManager({ initialProjects }: ProjectManagerProps) {
 
                                 <div className="flex flex-wrap gap-2">
                                     {project.github_url && (
-                                        <Button
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={() =>
-                                                window.open(
-                                                    project.github_url!,
-                                                    "_blank"
-                                                )
-                                            }
-                                            className="border-gray-600 hover:bg-gray-700 text-xs h-8 px-3"
+                                        <Link
+                                            href={project.github_url!}
+                                            target="_blank"
                                         >
-                                            <Github className="w-3 h-3 mr-1" />
-                                            GitHub
-                                        </Button>
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                className="border-gray-600 hover:bg-gray-700 text-xs h-8 px-3"
+                                            >
+                                                <Github className="w-3 h-3 mr-1" />
+                                                GitHub
+                                            </Button>
+                                        </Link>
                                     )}
                                     {project.live_url && (
-                                        <Button
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={() =>
-                                                window.open(
-                                                    project.live_url!,
-                                                    "_blank"
-                                                )
-                                            }
-                                            className="border-gray-600 hover:bg-gray-700 text-xs h-8 px-3"
+                                        <Link
+                                            href={project.live_url!}
+                                            target="_blank"
                                         >
-                                            <ExternalLink className="w-3 h-3 mr-1" />
-                                            Demo
-                                        </Button>
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                className="border-gray-600 hover:bg-gray-700 text-xs h-8 px-3"
+                                            >
+                                                <ExternalLink className="w-3 h-3 mr-1" />
+                                                Demo
+                                            </Button>
+                                        </Link>
                                     )}
                                 </div>
 
@@ -465,36 +464,34 @@ export function ProjectManager({ initialProjects }: ProjectManagerProps) {
 
                                             <div className="flex gap-2">
                                                 {project.github_url && (
-                                                    <Button
-                                                        variant="outline"
-                                                        size="sm"
-                                                        onClick={() =>
-                                                            window.open(
-                                                                project.github_url!,
-                                                                "_blank"
-                                                            )
-                                                        }
-                                                        className="border-gray-600 hover:bg-gray-700 text-xs"
+                                                    <Link
+                                                        href={project.github_url!}
+                                                        target="_blank"
                                                     >
-                                                        <Github className="w-3 h-3 mr-1" />
-                                                        GitHub
-                                                    </Button>
+                                                        <Button
+                                                            variant="outline"
+                                                            size="sm"
+                                                            className="border-gray-600 hover:bg-gray-700 text-xs"
+                                                        >
+                                                            <Github className="w-3 h-3 mr-1" />
+                                                            GitHub
+                                                        </Button>
+                                                    </Link>
                                                 )}
                                                 {project.live_url && (
-                                                    <Button
-                                                        variant="outline"
-                                                        size="sm"
-                                                        onClick={() =>
-                                                            window.open(
-                                                                project.live_url!,
-                                                                "_blank"
-                                                            )
-                                                        }
-                                                        className="border-gray-600 hover:bg-gray-700 text-xs"
+                                                    <Link
+                                                        href={project.live_url!}
+                                                        target="_blank"
                                                     >
-                                                        <ExternalLink className="w-3 h-3 mr-1" />
-                                                        Demo
-                                                    </Button>
+                                                        <Button
+                                                            variant="outline"
+                                                            size="sm"
+                                                            className="border-gray-600 hover:bg-gray-700 text-xs"
+                                                        >
+                                                            <ExternalLink className="w-3 h-3 mr-1" />
+                                                            Demo
+                                                        </Button>
+                                                    </Link>
                                                 )}
                                             </div>
                                         </div>

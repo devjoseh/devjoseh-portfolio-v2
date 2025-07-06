@@ -1,15 +1,16 @@
 "use client";
 
 import { Github, Linkedin, Youtube, Instagram, Mail, Globe, GraduationCap, Calendar, ExternalLink } from "lucide-react";
-import type { Link, ProfileSettings } from "@/utils/actions/links";
+import type { Link as dbLink, ProfileSettings } from "@/utils/actions/links";
 import { trackLinkClick } from "@/utils/actions/links";
 // import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 
 interface LinksPageProps {
-    initialLinks: Link[];
+    initialLinks: dbLink[];
     profileSettings: ProfileSettings | null;
 }
 
@@ -29,7 +30,7 @@ export function LinksPage({ initialLinks, profileSettings }: LinksPageProps) {
     const [isLoading, setIsLoading] = useState<string | null>(null);
     const [clickedLinks, setClickedLinks] = useState<Set<string>>(new Set());
 
-    const handleLinkClick = async (link: Link) => {
+    const handleLinkClick = async (link: dbLink) => {
         setIsLoading(link.id);
         setClickedLinks((prev) => new Set([...prev, link.id]));
 
@@ -46,7 +47,11 @@ export function LinksPage({ initialLinks, profileSettings }: LinksPageProps) {
         // Add a small delay for animation
         setTimeout(() => {
             setIsLoading(null);
-            window.open(link.url, "_blank", "noopener,noreferrer");
+            <Link
+                href={link.url}
+                target="_blank"
+                rel="noopener noreferrer"
+            />
         }, 300);
     };
 

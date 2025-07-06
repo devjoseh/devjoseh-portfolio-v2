@@ -8,17 +8,18 @@ import { Plus, Edit, Trash2, GripVertical, Save, User, Palette, Settings, MoreVe
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import type { Link, ProfileSettings } from "@/utils/actions/links";
+import type { Link as dbLink, ProfileSettings } from "@/utils/actions/links";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 interface LinksManagerProps {
-    initialLinks: Link[];
+    initialLinks: dbLink[];
     profileSettings: ProfileSettings | null;
 }
 
@@ -26,8 +27,9 @@ export function LinksManager({
     initialLinks,
     profileSettings,
 }: LinksManagerProps) {
+    const router = useRouter();
     const [links, setLinks] = useState(initialLinks);
-    const [editingLink, setEditingLink] = useState<Link | null>(null);
+    const [editingLink, setEditingLink] = useState<dbLink | null>(null);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [activeTab, setActiveTab] = useState<
         "links" | "profile" | "appearance"
@@ -35,7 +37,7 @@ export function LinksManager({
     const [isSaving, setIsSaving] = useState(false);
     const [draggedItem, setDraggedItem] = useState<string | null>(null);
 
-    const [newLink, setNewLink] = useState<Partial<Link>>({
+    const [newLink, setNewLink] = useState<Partial<dbLink>>({
         title: "",
         url: "",
         description: "",
@@ -86,7 +88,7 @@ export function LinksManager({
         { value: "from-gray-900 to-gray-800", label: "Dark Gradient" },
     ];
 
-    const handleSaveLink = async (linkData: Partial<Link>) => {
+    const handleSaveLink = async (linkData: Partial<dbLink>) => {
         setIsSaving(true);
         try {
             if (editingLink) {
@@ -104,7 +106,7 @@ export function LinksManager({
             } else {
                 const success = await createLink(
                     linkData as Omit<
-                        Link,
+                        dbLink,
                         "id" | "created_at" | "updated_at" | "click_count"
                     >
                 );
@@ -142,7 +144,7 @@ export function LinksManager({
         }
     };
 
-    const toggleLinkStatus = async (link: Link) => {
+    const toggleLinkStatus = async (link: dbLink) => {
         const success = await updateLink(link.id, {
             is_active: !link.is_active,
         });
@@ -184,6 +186,10 @@ export function LinksManager({
         await reorderLinks(ids);
     };
 
+    const handleLinksPage = () => {
+        router.push('/links');
+    };
+
     return (
         <div className="space-y-4 md:space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -195,8 +201,9 @@ export function LinksManager({
                         Configure seus links e perfil
                     </p>
                 </div>
+                
                 <Button
-                    onClick={() => window.open("/links", "_blank")}
+                    onClick={() => handleLinksPage()}
                     className="bg-pink-600 hover:bg-pink-700 w-full sm:w-auto"
                 >
                     Ver Página de Links

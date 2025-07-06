@@ -2,6 +2,7 @@
 
 import { Github, Linkedin, Mail, Youtube, Instagram } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export function Footer() {
     return (
@@ -20,71 +21,66 @@ export function Footer() {
                     </div>
 
                     <div className="flex items-center space-x-4">
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            className="text-gray-400 hover:text-purple-400"
-                            onClick={() =>
-                                window.open(
-                                    "https://instagram.com/devjoseh",
-                                    "_blank"
-                                )
-                            }
+                        <Link
+                            href="https://instagram.com/dev_joseh"
+                            target="_blank"
                         >
-                            <Instagram className="w-5 h-5" />
-                        </Button>
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            className="text-gray-400 hover:text-purple-400"
-                            onClick={() =>
-                                window.open(
-                                    "https://youtube.com/@devjoseh",
-                                    "_blank"
-                                )
-                            }
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="text-gray-400 hover:text-purple-400"
+                            >
+                                <Instagram className="w-5 h-5" />
+                            </Button>
+                        </Link>
+                        <Link
+                            href="https://youtube.com/@devjoseh"
+                            target="_blank"
                         >
-                            <Youtube className="w-5 h-5" />
-                        </Button>
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            className="text-gray-400 hover:text-purple-400"
-                            onClick={() =>
-                                window.open(
-                                    "https://linkedin.com/in/devjoseh",
-                                    "_blank"
-                                )
-                            }
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="text-gray-400 hover:text-purple-400"
+                            >
+                                <Youtube className="w-5 h-5" />
+                            </Button>
+                        </Link>
+                        <Link
+                            href="https://linkedin.com/in/devjoseh"
+                            target="_blank"
                         >
-                            <Linkedin className="w-5 h-5" />
-                        </Button>
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            className="text-gray-400 hover:text-purple-400"
-                            onClick={() =>
-                                window.open(
-                                    "https://github.com/devjoseh",
-                                    "_blank"
-                                )
-                            }
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="text-gray-400 hover:text-purple-400"
+                            >
+                                <Linkedin className="w-5 h-5" />
+                            </Button>
+                        </Link>
+                        <Link
+                            href="https://github.com/devjoseh"
+                            target="_blank"
                         >
-                            <Github className="w-5 h-5" />
-                        </Button>
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            className="text-gray-400 hover:text-purple-400"
-                            onClick={() =>
-                                window.open(
-                                    "mailto:contato@devjoseh.dev",
-                                    "_blank"
-                                )
-                            }
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="text-gray-400 hover:text-purple-400"
+                            >
+                                <Github className="w-5 h-5" />
+                            </Button>
+                        </Link>
+                        <Link
+                            href="mailto:contato@devjoseh.com.br"
+                            target="_blank"
                         >
-                            <Mail className="w-5 h-5" />
-                        </Button>
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="text-gray-400 hover:text-purple-400"
+                            >
+                                <Mail className="w-5 h-5" />
+                            </Button>
+                        </Link>
                     </div>
                 </div>
 

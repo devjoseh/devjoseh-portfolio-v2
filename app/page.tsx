@@ -1,5 +1,5 @@
 import { QuoteSection, AboutSection, HeroSection, Navigation, Footer, SkillsToolsSection, ExperienceSection, ProjectsSection, HackathonsSection } from "@/components/index";
-
+ 
 export default function Home() {
     return (
         <div className="min-h-screen bg-gray-900 text-white">
@@ -9,19 +9,15 @@ export default function Home() {
                 <div id="about">
                     <AboutSection />
                 </div>
-
                 <div id="skills-tools">
                     <SkillsToolsSection />
                 </div>
-
                 <div id="experience">
                     <ExperienceSection />
                 </div>
-
                 <div id="projects">
                     <ProjectsSection />
                 </div>
-
                 <div id="hackathons">
                     <HackathonsSection />
                 </div>

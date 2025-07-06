@@ -82,8 +82,7 @@ export function ExperienceSection() {
                         Experiência
                     </h2>
                     <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto px-4 animate-fadeInUp delay-200">
-                        Minha jornada no desenvolvimento backend, construindo
-                        sistemas escaláveis e liderando iniciativas técnicas.
+                        Minha jornada no desenvolvimento backend
                     </p>
                 </div>
 

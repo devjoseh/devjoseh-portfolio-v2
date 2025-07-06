@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowDown, Github, Linkedin, Mail } from "lucide-react";
+import Link from "next/link";
 
 export function HeroSection() {
     const [isVisible, setIsVisible] = useState(false);
@@ -73,27 +74,42 @@ export function HeroSection() {
                             Ver Meus Projetos
                         </Button>
                         <div className="flex gap-4">
-                            <Button
-                                variant="outline"
-                                size="icon"
-                                className="rounded-full border-purple-500/30 hover:border-purple-500 hover:bg-purple-500/10 bg-transparent transition-all duration-300 hover:scale-110"
+                            <Link
+                                href="https://github.com/DevJoseH"
+                                target="_blank"
                             >
-                                <Github className="w-5 h-5" />
-                            </Button>
-                            <Button
-                                variant="outline"
-                                size="icon"
-                                className="rounded-full border-purple-500/30 hover:border-purple-500 hover:bg-purple-500/10 bg-transparent transition-all duration-300 hover:scale-110"
+                                <Button
+                                    variant="outline"
+                                    size="icon"
+                                    className="rounded-full border-purple-500/30 hover:border-purple-500 hover:bg-purple-500/10 bg-transparent transition-all duration-300 hover:scale-110"
+                                >
+                                    <Github className="w-5 h-5" />
+                                </Button>
+                            </Link>
+                            <Link
+                                href="https://www.linkedin.com/in/devjoseh/"
+                                target="_blank"
                             >
-                                <Linkedin className="w-5 h-5" />
-                            </Button>
-                            <Button
-                                variant="outline"
-                                size="icon"
-                                className="rounded-full border-purple-500/30 hover:border-purple-500 hover:bg-purple-500/10 bg-transparent transition-all duration-300 hover:scale-110"
+                                <Button
+                                    variant="outline"
+                                    size="icon"
+                                    className="rounded-full border-purple-500/30 hover:border-purple-500 hover:bg-purple-500/10 bg-transparent transition-all duration-300 hover:scale-110"
+                                >
+                                    <Linkedin className="w-5 h-5" />
+                                </Button>
+                            </Link>
+                            <Link
+                                href="mailto:contato@devjoseh.com.br"
+                                target="_blank"
                             >
-                                <Mail className="w-5 h-5" />
-                            </Button>
+                                <Button
+                                    variant="outline"
+                                    size="icon"
+                                    className="rounded-full border-purple-500/30 hover:border-purple-500 hover:bg-purple-500/10 bg-transparent transition-all duration-300 hover:scale-110"
+                                >
+                                    <Mail className="w-5 h-5" />
+                                </Button>
+                            </Link>
                         </div>
                     </div>
 

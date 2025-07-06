@@ -3,7 +3,6 @@
 import type React from "react"
 
 import { useState, useEffect, useCallback } from "react"
-import { createPortal } from "react-dom"
 import Image from "next/image"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -12,114 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { X, ChevronLeft, ChevronRight, Calendar, Trophy, Eye, MousePointer, Sparkles, Maximize2 } from "lucide-react"
 import { getHackathons, type Hackathon } from "@/utils/actions/data"
 
-// Enhanced full-screen image viewer with comprehensive mobile support
-function FullScreenImageViewer({
-  imageUrl,
-  imageAlt,
-  onClose,
-}: {
-  imageUrl: string
-  imageAlt: string
-  onClose: () => void
-}) {
-  const [isMounted, setIsMounted] = useState(false)
-
-  // O useEffect para gerenciar o scroll do body e a tecla 'Escape' está ótimo e foi mantido.
-  useEffect(() => {
-    setIsMounted(true)
-    const originalOverflow = document.body.style.overflow
-    document.body.style.overflow = "hidden"
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        onClose()
-      }
-    }
-
-    document.addEventListener("keydown", handleKeyDown)
-
-    return () => {
-      document.body.style.overflow = originalOverflow
-      document.removeEventListener("keydown", handleKeyDown)
-      setIsMounted(false) // Embora o componente seja desmontado, é uma boa prática.
-    }
-  }, [onClose])
-
-  // Não renderiza no servidor
-  if (!isMounted) {
-    return null
-  }
-
-  // A lógica de fechar é simplesmente chamar a função recebida por props.
-  const handleClose = () => {
-    onClose()
-  }
-
-  // Previne que o clique na imagem feche o modal (parando a propagação do evento)
-  const handleImageContainerClick = (e: React.MouseEvent) => {
-    e.stopPropagation()
-  }
-
-  const fullScreenContent = (
-    <div
-      // A mágica acontece aqui: usamos apenas o onClick. O React trata o toque como um clique.
-      // O backdrop só fecha se o clique for nele mesmo, e não nos seus filhos.
-      onClick={handleClose}
-      className="fixed inset-0 bg-black/90 flex items-center justify-center p-4 z-[99999] backdrop-blur-sm"
-      role="dialog"
-      aria-modal="true"
-      aria-label="Visualizador de imagem em tela cheia"
-    >
-      {/* Botão de fechar (X) - usa o mesmo manipulador onClick simples */}
-      <button
-        type="button"
-        onClick={handleClose}
-        className="absolute top-4 right-4 p-3 rounded-full bg-gray-900/80 hover:bg-gray-800 text-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 active:scale-95 z-[100001]"
-        aria-label="Fechar"
-      >
-        <X className="w-6 h-6" />
-      </button>
-
-      {/* Botão de "Zoom out" - também usa o mesmo manipulador simples */}
-      <button
-        type="button"
-        onClick={handleClose}
-        className="absolute top-4 left-4 p-3 rounded-full bg-gray-900/80 hover:bg-gray-800 text-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 active:scale-95 z-[100001]"
-        aria-label="Diminuir zoom"
-      >
-        <Maximize2 className="w-6 h-6 rotate-180" />
-      </button>
-
-      {/* Contêiner da imagem - impede o fechamento ao clicar na imagem */}
-      <div
-        className="relative max-w-[95vw] max-h-[95vh] flex items-center justify-center"
-        // Este é o truque principal: paramos a propagação do clique aqui.
-        onClick={handleImageContainerClick}
-      >
-        <Image
-          src={imageUrl || "/placeholder.svg"}
-          alt={imageAlt}
-          width={1920}
-          height={1080}
-          className="max-w-full max-h-full object-contain rounded-lg shadow-2xl pointer-events-none"
-          priority
-          quality={90}
-          draggable={false}
-        />
-      </div>
-
-      {/* Instruções de fechamento */}
-      <div className="absolute bottom-5 left-1/2 -translate-x-1/2 bg-gray-900/80 rounded-full px-4 py-2 pointer-events-none">
-        <span className="text-white text-sm">
-          <span className="hidden sm:inline">Pressione ESC ou clique fora para fechar</span>
-          <span className="sm:hidden">Toque fora para fechar</span>
-        </span>
-      </div>
-    </div>
-  )
-
-  return createPortal(fullScreenContent, document.body)
-}
+// O componente FullScreenImageViewer foi removido, pois sua lógica foi integrada ao Dialog.
 
 export function HackathonsSection() {
   const [hackathons, setHackathons] = useState<Hackathon[]>([])
@@ -127,10 +19,9 @@ export function HackathonsSection() {
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0)
   const [loading, setLoading] = useState(true)
   const [hoveredCard, setHoveredCard] = useState<string | null>(null)
-  const [fullScreenImage, setFullScreenImage] = useState<{
-    url: string
-    alt: string
-  } | null>(null)
+  
+  // Este estado agora controla se a visualização de imagem em tela cheia está ativa DENTRO do Dialog
+  const [isFullScreen, setIsFullScreen] = useState(false)
 
   useEffect(() => {
     const fetchHackathons = async () => {
@@ -143,7 +34,6 @@ export function HackathonsSection() {
         setLoading(false)
       }
     }
-
     fetchHackathons()
   }, [])
 
@@ -158,134 +48,67 @@ export function HackathonsSection() {
     }
   }
 
-  // Modal management with enhanced state handling
   const openModal = useCallback((hackathon: Hackathon) => {
     setSelectedHackathon(hackathon)
     setCurrentPhotoIndex(0)
+    setIsFullScreen(false) // Garante que o modal sempre abra na visualização de detalhes
   }, [])
 
   const closeModal = useCallback(() => {
-    if (!fullScreenImage) {
-      setSelectedHackathon(null)
-      setCurrentPhotoIndex(0)
-    }
-  }, [fullScreenImage])
-
-  const forceCloseModal = useCallback(() => {
     setSelectedHackathon(null)
-    setCurrentPhotoIndex(0)
-    setFullScreenImage(null)
+    setIsFullScreen(false)
   }, [])
 
-  // Photo navigation with enhanced mobile support
   const nextPhoto = useCallback(() => {
-    if (selectedHackathon && selectedHackathon.photos.length > 1 && !fullScreenImage) {
+    if (selectedHackathon) {
       setCurrentPhotoIndex((prev) => (prev + 1) % selectedHackathon.photos.length)
     }
-  }, [selectedHackathon, fullScreenImage])
+  }, [selectedHackathon])
 
   const prevPhoto = useCallback(() => {
-    if (selectedHackathon && selectedHackathon.photos.length > 1 && !fullScreenImage) {
+    if (selectedHackathon) {
       setCurrentPhotoIndex((prev) => (prev - 1 + selectedHackathon.photos.length) % selectedHackathon.photos.length)
     }
-  }, [selectedHackathon, fullScreenImage])
+  }, [selectedHackathon])
 
-  // Enhanced full-screen image handling
-  const openFullScreenImage = useCallback(() => {
-    if (selectedHackathon && selectedHackathon.photos[currentPhotoIndex]) {
-      const photo = selectedHackathon.photos[currentPhotoIndex]
-      setFullScreenImage({
-        url: photo.url,
-        alt: photo.alt,
-      })
+  // Gerencia o estado de abertura do Dialog
+  const handleModalOpenChange = useCallback((open: boolean) => {
+    if (!open) {
+      closeModal()
     }
-  }, [selectedHackathon, currentPhotoIndex])
+  }, [closeModal])
 
-  const closeFullScreenImage = useCallback(() => {
-    setFullScreenImage(null)
-  }, [])
-
-  // Enhanced keyboard navigation
+  // Gerencia as teclas de seta e Esc
   useEffect(() => {
-    if (!selectedHackathon || fullScreenImage) return
-
     const handleKeyDown = (event: KeyboardEvent) => {
-      switch (event.key) {
-        case "ArrowLeft":
-          event.preventDefault()
-          prevPhoto()
-          break
-        case "ArrowRight":
-          event.preventDefault()
-          nextPhoto()
-          break
-        case "Escape":
-          event.preventDefault()
-          closeModal()
-          break
-      }
-    }
+      if (!selectedHackathon) return
 
-    document.addEventListener("keydown", handleKeyDown, { passive: false })
-    return () => document.removeEventListener("keydown", handleKeyDown)
-  }, [selectedHackathon, fullScreenImage, prevPhoto, nextPhoto, closeModal])
-
-  // Enhanced modal dialog handling
-  const handleModalOpenChange = useCallback(
-    (open: boolean) => {
-      if (!open) {
-        if (fullScreenImage) {
-          setFullScreenImage(null)
+      if (event.key === "Escape") {
+        event.preventDefault()
+        // Se estiver em tela cheia, primeiro sai da tela cheia. Senão, fecha o modal.
+        if (isFullScreen) {
+          setIsFullScreen(false)
         } else {
-          forceCloseModal()
+          closeModal()
         }
       }
-    },
-    [fullScreenImage, forceCloseModal],
-  )
 
-  // Enhanced image expand handler with comprehensive mobile support
-  const handleImageExpand = useCallback(
-    (event: React.MouseEvent | React.TouchEvent) => {
-      if (fullScreenImage) return
-
-      event.preventDefault()
-      event.stopPropagation()
-
-      // Use requestAnimationFrame for smooth transition
-      requestAnimationFrame(() => {
-        openFullScreenImage()
-      })
-    },
-    [fullScreenImage, openFullScreenImage],
-  )
-
-  // Enhanced navigation button handler
-  const handleNavigation = useCallback(
-    (direction: "prev" | "next", event: React.MouseEvent | React.TouchEvent) => {
-      event.preventDefault()
-      event.stopPropagation()
-
-      if (direction === "prev") {
-        prevPhoto()
-      } else {
-        nextPhoto()
+      // A navegação por setas só funciona se houver fotos e não estiver em tela cheia
+      if (selectedHackathon.photos.length > 1 && !isFullScreen) {
+        if (event.key === "ArrowLeft") {
+          event.preventDefault()
+          prevPhoto()
+        }
+        if (event.key === "ArrowRight") {
+          event.preventDefault()
+          nextPhoto()
+        }
       }
-    },
-    [prevPhoto, nextPhoto],
-  )
+    }
 
-  // Enhanced photo indicator handler
-  const handlePhotoIndicator = useCallback(
-    (index: number, event: React.MouseEvent | React.TouchEvent) => {
-      if (fullScreenImage) return
-
-      event.preventDefault()
-      event.stopPropagation()
-      setCurrentPhotoIndex(index)
-    },
-    [fullScreenImage],
-  )
+    document.addEventListener("keydown", handleKeyDown)
+    return () => document.removeEventListener("keydown", handleKeyDown)
+  }, [selectedHackathon, isFullScreen, closeModal, prevPhoto, nextPhoto])
 
   if (loading) {
     return (
@@ -333,7 +156,6 @@ export function HackathonsSection() {
   return (
     <>
       <section className="py-16 md:py-20 bg-gray-900 relative overflow-hidden">
-        {/* Background elements */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-20 left-20 w-64 h-64 bg-yellow-500/5 rounded-full blur-3xl animate-pulse" />
           <div className="absolute bottom-20 right-20 w-96 h-96 bg-purple-600/3 rounded-full blur-3xl animate-pulse delay-1000" />
@@ -373,19 +195,16 @@ export function HackathonsSection() {
                 onMouseEnter={() => setHoveredCard(hackathon.id)}
                 onMouseLeave={() => setHoveredCard(null)}
               >
-                {/* Sparkle effect */}
                 <div className="absolute top-4 left-4 opacity-0 group-hover:opacity-100 transition-all duration-300 z-40">
                   <Sparkles className="w-5 h-5 text-purple-400" />
                 </div>
 
-                {/* Placement badge */}
                 <Badge
                   className={`absolute top-4 right-4 z-40 ${getPlacementColor(hackathon.placementType)} font-semibold backdrop-blur-sm transition-all duration-300`}
                 >
                   {hackathon.placement}
                 </Badge>
 
-                {/* Click indicator */}
                 <div className="absolute top-4 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 z-40">
                   <div className="bg-gray-900/90 backdrop-blur-sm rounded-full px-3 py-1.5 flex items-center gap-2 border border-purple-500/30">
                     <Eye className="w-3 h-3 text-purple-400" />
@@ -405,7 +224,6 @@ export function HackathonsSection() {
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                       />
 
-                      {/* Photo count indicator */}
                       {hackathon.photos.length > 0 && (
                         <div className="absolute bottom-3 right-3 bg-gray-900/80 backdrop-blur-sm rounded-full px-2 py-1 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all duration-300">
                           <div className="w-2 h-2 bg-purple-400 rounded-full" />
@@ -448,92 +266,90 @@ export function HackathonsSection() {
             ))}
           </div>
 
-          {/* Enhanced Hackathon Details Modal */}
+          {/* O Dialog agora gerencia tanto a visualização de detalhes quanto a de tela cheia */}
           <Dialog open={!!selectedHackathon} onOpenChange={handleModalOpenChange}>
             <DialogContent
-              className="max-w-4xl max-h-[90vh] overflow-y-auto bg-gray-800 border-gray-700 text-white"
-              style={{ zIndex: 50 }}
+              className={isFullScreen
+                // Estilos para a visualização em tela cheia
+                ? "p-0 m-0 w-screen h-screen max-w-full max-h-full bg-black/95 border-none rounded-none"
+                // Estilos para a visualização de detalhes padrão
+                : "max-w-4xl max-h-[90vh] overflow-y-auto bg-gray-800 border-gray-700 text-white"
+              }
+              // Impede que o Dialog seja fechado clicando fora quando em tela cheia
+              onInteractOutside={(e) => {
+                if (isFullScreen) {
+                  e.preventDefault();
+                }
+              }}
             >
-              <DialogHeader>
-                <DialogTitle className="text-2xl font-bold text-white pr-8">{selectedHackathon?.title}</DialogTitle>
-                <div className="flex items-center gap-2 text-gray-400">
-                  <Calendar className="w-4 h-4" />
-                  <span>{selectedHackathon?.date}</span>
-                </div>
-              </DialogHeader>
-
-              {selectedHackathon && (
-                <div className="space-y-6">
-                  {/* Result highlight */}
-                  <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-purple-900/30 to-purple-800/30 rounded-lg border border-purple-500/30">
-                    <Trophy className="w-6 h-6 text-yellow-400" />
-                    <div>
-                      <span className="text-gray-300">Resultado: </span>
-                      <span className="font-semibold text-white">{selectedHackathon.placement}</span>
-                    </div>
-                  </div>
-
-                  {/* Cover image */}
-                  <div className="w-full h-64 md:h-80 rounded-lg overflow-hidden">
+              {isFullScreen && selectedHackathon ? (
+                // --- VISUALIZAÇÃO DE IMAGEM EM TELA CHEIA ---
+                <>
+                  <button
+                    onClick={() => setIsFullScreen(false)}
+                    className="absolute top-4 right-4 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors z-50"
+                    aria-label="Fechar visualização em tela cheia"
+                  >
+                    <X className="w-8 h-8" />
+                  </button>
+                  <div className="relative w-full h-full flex items-center justify-center p-4 sm:p-8">
                     <Image
-                      src={selectedHackathon.coverImage || "/placeholder.svg"}
-                      alt={selectedHackathon.title}
-                      width={800}
-                      height={400}
-                      className="w-full h-full object-cover"
+                      src={selectedHackathon.photos[currentPhotoIndex]?.url || "/placeholder.svg"}
+                      alt={selectedHackathon.photos[currentPhotoIndex]?.alt || "Foto do Hackathon"}
+                      fill
+                      sizes="100vw"
+                      className="object-contain"
                       priority
                     />
                   </div>
+                </>
+              ) : selectedHackathon ? (
+                // --- VISUALIZAÇÃO DE DETALHES DO HACKATHON ---
+                <>
+                  <DialogHeader>
+                    <DialogTitle className="text-2xl font-bold text-white pr-8">{selectedHackathon.title}</DialogTitle>
+                    <div className="flex items-center gap-2 text-gray-400">
+                      <Calendar className="w-4 h-4" />
+                      <span>{selectedHackathon.date}</span>
+                    </div>
+                  </DialogHeader>
 
-                  {/* Description */}
-                  <div>
-                    <h3 className="text-xl font-semibold mb-3 text-white">Sobre o Projeto</h3>
-                    <p className="text-gray-300 leading-relaxed">{selectedHackathon.description}</p>
-                  </div>
-
-                  {/* Enhanced photo carousel */}
-                  {selectedHackathon.photos.length > 0 && (
+                  <div className="space-y-6">
+                    <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-purple-900/30 to-purple-800/30 rounded-lg border border-purple-500/30">
+                      <Trophy className="w-6 h-6 text-yellow-400" />
+                      <div>
+                        <span className="text-gray-300">Resultado: </span>
+                        <span className="font-semibold text-white">{selectedHackathon.placement}</span>
+                      </div>
+                    </div>
+                    <div className="w-full h-64 md:h-80 rounded-lg overflow-hidden">
+                      <Image
+                        src={selectedHackathon.coverImage || "/placeholder.svg"}
+                        alt={selectedHackathon.title}
+                        width={800} height={400}
+                        className="w-full h-full object-cover" priority
+                      />
+                    </div>
                     <div>
-                      <h3 className="text-xl font-semibold mb-4 text-white">Galeria de Fotos</h3>
-                      <div className="relative">
-                        <div className="w-full h-64 md:h-80 rounded-lg overflow-hidden bg-gray-900 relative group">
-                          {/* Enhanced main image with comprehensive mobile support */}
-                          <div
-                            className={`w-full h-full relative ${fullScreenImage ? "cursor-default" : "cursor-pointer"}`}
-                            onClick={handleImageExpand}
-                            onTouchEnd={handleImageExpand}
-                            onTouchStart={(e) => {
-                              if (!fullScreenImage) {
-                                e.preventDefault()
-                              }
-                            }}
-                            style={{
-                              touchAction: fullScreenImage ? "none" : "manipulation",
-                              WebkitTapHighlightColor: "transparent",
-                            }}
-                          >
-                            <Image
-                              src={selectedHackathon.photos[currentPhotoIndex]?.url || "/placeholder.svg"}
-                              alt={selectedHackathon.photos[currentPhotoIndex]?.alt || "Hackathon photo"}
-                              width={800}
-                              height={400}
-                              className={`w-full h-full object-cover transition-transform duration-300 ${
-                                fullScreenImage ? "" : "group-hover:scale-105"
-                              }`}
-                              loading="lazy"
-                            />
-
-                            {/* Expand indicator */}
-                            {!fullScreenImage && (
-                              <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                <div className="bg-gray-900/80 backdrop-blur-sm rounded-full p-2">
-                                  <Maximize2 className="w-4 h-4 text-white" />
-                                </div>
-                              </div>
-                            )}
-
-                            {/* Click hint */}
-                            {!fullScreenImage && (
+                      <h3 className="text-xl font-semibold mb-3 text-white">Sobre o Projeto</h3>
+                      <p className="text-gray-300 leading-relaxed">{selectedHackathon.description}</p>
+                    </div>
+                    {selectedHackathon.photos.length > 0 && (
+                      <div>
+                        <h3 className="text-xl font-semibold mb-4 text-white">Galeria de Fotos</h3>
+                        <div className="relative">
+                          <div className="w-full h-64 md:h-80 rounded-lg overflow-hidden bg-gray-900 relative group">
+                            <div
+                              className="w-full h-full relative cursor-pointer"
+                              onClick={() => setIsFullScreen(true)}
+                            >
+                              <Image
+                                src={selectedHackathon.photos[currentPhotoIndex]?.url || "/placeholder.svg"}
+                                alt={selectedHackathon.photos[currentPhotoIndex]?.alt || "Hackathon photo"}
+                                width={800} height={400}
+                                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                loading="lazy"
+                              />
                               <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/20">
                                 <div className="bg-gray-900/90 backdrop-blur-sm rounded-full px-4 py-2 flex items-center gap-2">
                                   <Maximize2 className="w-4 h-4 text-white" />
@@ -543,88 +359,46 @@ export function HackathonsSection() {
                                   </span>
                                 </div>
                               </div>
+                            </div>
+                            {selectedHackathon.photos.length > 1 && (
+                              <>
+                                <Button
+                                  variant="outline" size="icon"
+                                  className="absolute left-2 top-1/2 -translate-y-1/2 bg-gray-900/80 border-gray-600 hover:bg-gray-800"
+                                  onClick={(e) => { e.stopPropagation(); prevPhoto(); }}
+                                >
+                                  <ChevronLeft className="w-4 h-4" />
+                                </Button>
+                                <Button
+                                  variant="outline" size="icon"
+                                  className="absolute right-2 top-1/2 -translate-y-1/2 bg-gray-900/80 border-gray-600 hover:bg-gray-800"
+                                  onClick={(e) => { e.stopPropagation(); nextPhoto(); }}
+                                >
+                                  <ChevronRight className="w-4 h-4" />
+                                </Button>
+                              </>
                             )}
                           </div>
-
-                          {/* Enhanced navigation buttons */}
                           {selectedHackathon.photos.length > 1 && (
-                            <>
-                              <Button
-                                variant="outline"
-                                size="icon"
-                                className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-gray-900/80 border-gray-600 hover:bg-gray-800 active:scale-95"
-                                onClick={(e) => handleNavigation("prev", e)}
-                                onTouchEnd={(e) => handleNavigation("prev", e)}
-                                onTouchStart={(e) => e.preventDefault()}
-                                disabled={!!fullScreenImage}
-                                style={{
-                                  touchAction: "manipulation",
-                                  WebkitTapHighlightColor: "transparent",
-                                }}
-                              >
-                                <ChevronLeft className="w-4 h-4" />
-                              </Button>
-                              <Button
-                                variant="outline"
-                                size="icon"
-                                className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-gray-900/80 border-gray-600 hover:bg-gray-800 active:scale-95"
-                                onClick={(e) => handleNavigation("next", e)}
-                                onTouchEnd={(e) => handleNavigation("next", e)}
-                                onTouchStart={(e) => e.preventDefault()}
-                                disabled={!!fullScreenImage}
-                                style={{
-                                  touchAction: "manipulation",
-                                  WebkitTapHighlightColor: "transparent",
-                                }}
-                              >
-                                <ChevronRight className="w-4 h-4" />
-                              </Button>
-                            </>
+                            <div className="flex justify-center gap-2 mt-4">
+                              {selectedHackathon.photos.map((_, index) => (
+                                <button
+                                  key={index}
+                                  className={`w-2 h-2 rounded-full transition-colors ${index === currentPhotoIndex ? "bg-purple-500" : "bg-gray-600"}`}
+                                  onClick={() => setCurrentPhotoIndex(index)}
+                                  aria-label={`Ir para a foto ${index + 1}`}
+                                />
+                              ))}
+                            </div>
                           )}
                         </div>
-
-                        {/* Enhanced photo indicators */}
-                        {selectedHackathon.photos.length > 1 && (
-                          <div className="flex justify-center gap-2 mt-4">
-                            {selectedHackathon.photos.map((_, index) => (
-                              <button
-                                key={index}
-                                className={`w-2 h-2 rounded-full transition-colors active:scale-95 ${
-                                  index === currentPhotoIndex ? "bg-purple-500" : "bg-gray-600"
-                                } ${fullScreenImage ? "cursor-default" : "cursor-pointer"}`}
-                                onClick={(e) => handlePhotoIndicator(index, e)}
-                                onTouchEnd={(e) => handlePhotoIndicator(index, e)}
-                                onTouchStart={(e) => {
-                                  if (!fullScreenImage) {
-                                    e.preventDefault()
-                                  }
-                                }}
-                                disabled={!!fullScreenImage}
-                                aria-label={`Go to photo ${index + 1}`}
-                                style={{
-                                  touchAction: "manipulation",
-                                  WebkitTapHighlightColor: "transparent",
-                                }}
-                              />
-                            ))}
-                          </div>
-                        )}
                       </div>
-                    </div>
-                  )}
-                </div>
-              )}
+                    )}
+                  </div>
+                </>
+              ) : null}
             </DialogContent>
           </Dialog>
-
-          {/* Enhanced full-screen image viewer */}
-          {fullScreenImage && (
-            <FullScreenImageViewer
-              imageUrl={fullScreenImage.url}
-              imageAlt={fullScreenImage.alt}
-              onClose={closeFullScreenImage}
-            />
-          )}
         </div>
       </section>
     </>

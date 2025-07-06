@@ -3,7 +3,7 @@
 import { Github, Linkedin, Youtube, Instagram, Mail, Globe, GraduationCap, Calendar, ExternalLink } from "lucide-react";
 import type { Link, ProfileSettings } from "@/utils/actions/links";
 import { trackLinkClick } from "@/utils/actions/links";
-import { Badge } from "@/components/ui/badge";
+// import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { useState } from "react";
 import Image from "next/image";
@@ -123,16 +123,9 @@ export function LinksPage({ initialLinks, profileSettings }: LinksPageProps) {
                         return (
                             <Card
                                 key={link.id}
-                                className={`
-                  relative overflow-hidden cursor-pointer transition-all duration-300 transform
-                  ${
-                      isCurrentlyLoading
-                          ? "scale-95 opacity-80"
-                          : "hover:scale-105 hover:shadow-2xl"
-                  }
-                  ${isClicked ? "animate-pulse" : ""}
-                  border-0 shadow-lg backdrop-blur-sm
-                `}
+                                className={` relative overflow-hidden cursor-pointer transition-all duration-300 transform 
+                                    ${isCurrentlyLoading ? "scale-95 opacity-80" : "hover:scale-105 hover:shadow-2xl"}
+                                    ${isClicked ? "animate-pulse" : ""} border-0 shadow-lg backdrop-blur-sm`}
                                 style={{
                                     backgroundColor: `${link.background_color}15`,
                                     borderColor: `${link.background_color}30`,
@@ -188,7 +181,7 @@ export function LinksPage({ initialLinks, profileSettings }: LinksPageProps) {
                                         )}
                                     </div>
 
-                                    <div className="flex-shrink-0 flex items-center gap-2">
+                                    {/* <div className="flex-shrink-0 flex items-center gap-2">
                                         {link.click_count > 0 && (
                                             <Badge
                                                 variant="secondary"
@@ -201,7 +194,7 @@ export function LinksPage({ initialLinks, profileSettings }: LinksPageProps) {
                                             className="w-4 h-4 opacity-60"
                                             style={{ color: link.text_color }}
                                         />
-                                    </div>
+                                    </div> */}
                                 </div>
 
                                 {/* Loading overlay */}

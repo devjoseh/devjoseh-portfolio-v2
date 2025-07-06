@@ -103,7 +103,15 @@ function FullScreenImageViewer({
         (event: React.MouseEvent | React.TouchEvent) => {
             event.preventDefault();
             event.stopPropagation();
-            onClose();
+            
+            // For touch events, add a small delay to prevent conflicts
+            if (event.type === 'touchend') {
+                setTimeout(() => {
+                    onClose();
+                }, 50);
+            } else {
+                onClose();
+            }
         },
         [onClose]
     );
@@ -135,12 +143,14 @@ function FullScreenImageViewer({
             <button
                 type="button"
                 onClick={handleCloseInteraction}
-                onTouchEnd={handleCloseInteraction} // Add touch support
+                onTouchStart={(e) => e.preventDefault()} // Prevent touch highlight
+                onTouchEnd={handleCloseInteraction}
                 className="absolute top-4 right-4 p-3 rounded-full bg-gray-900/90 hover:bg-gray-800/95 text-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 shadow-lg active:scale-95"
                 style={{
                     zIndex: 100001,
-                    touchAction: "manipulation", // Optimize for touch
-                    WebkitTapHighlightColor: "transparent", // Remove iOS tap highlight
+                    touchAction: "manipulation",
+                    WebkitTapHighlightColor: "transparent",
+                    userSelect: "none", // Prevent text selection
                 }}
                 aria-label="Close full screen view"
             >
@@ -151,12 +161,14 @@ function FullScreenImageViewer({
             <button
                 type="button"
                 onClick={handleCloseInteraction}
-                onTouchEnd={handleCloseInteraction} // Add touch support
+                onTouchStart={(e) => e.preventDefault()} // Prevent touch highlight
+                onTouchEnd={handleCloseInteraction}
                 className="absolute top-4 left-4 p-3 rounded-full bg-gray-900/90 hover:bg-gray-800/95 text-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 shadow-lg active:scale-95"
                 style={{
                     zIndex: 100001,
                     touchAction: "manipulation",
                     WebkitTapHighlightColor: "transparent",
+                    userSelect: "none", // Prevent text selection
                 }}
                 aria-label="Zoom out"
             >

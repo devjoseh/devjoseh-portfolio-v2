@@ -26,6 +26,7 @@ import {
     Maximize2,
 } from "lucide-react";
 import { getHackathons, type Hackathon } from "@/utils/actions/data";
+import { useRef } from "react";
 
 // Full-screen image viewer with enhanced mobile support
 function FullScreenImageViewer({
@@ -38,6 +39,8 @@ function FullScreenImageViewer({
     onClose: () => void;
 }) {
     const [isMounted, setIsMounted] = useState(false);
+    const [isClosing, setIsClosing] = useState(false);
+    const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     useEffect(() => {
         setIsMounted(true);
@@ -48,82 +51,101 @@ function FullScreenImageViewer({
         const originalTouchAction = document.body.style.touchAction;
 
         document.body.style.overflow = "hidden";
-        document.body.style.position = "relative";
-        document.body.style.touchAction = "none"; // Prevent mobile scrolling
+        document.body.style.position = "fixed";
+        document.body.style.touchAction = "none";
+        document.body.style.width = "100%";
+        document.body.style.height = "100%";
 
         // Keyboard handling
         const handleKeyDown = (event: KeyboardEvent) => {
             if (event.key === "Escape") {
                 event.preventDefault();
                 event.stopPropagation();
-                onClose();
+                handleClose();
             }
         };
 
-        document.addEventListener("keydown", handleKeyDown, { capture: true });
+        document.addEventListener("keydown", handleKeyDown, { 
+            capture: true,
+            passive: false 
+        });
 
         return () => {
             document.body.style.overflow = originalOverflow;
             document.body.style.position = originalPosition;
             document.body.style.touchAction = originalTouchAction;
+            document.body.style.width = "";
+            document.body.style.height = "";
             document.removeEventListener("keydown", handleKeyDown, {
                 capture: true,
             });
+            
+            if (closeTimeoutRef.current) {
+                clearTimeout(closeTimeoutRef.current);
+            }
+            
             setIsMounted(false);
         };
-    }, [onClose]);
+    }, []);
 
-    // Enhanced backdrop interaction handling for both mouse and touch
-    const handleBackdropInteraction = useCallback(
-        (
-            event:
-                | React.MouseEvent<HTMLDivElement>
-                | React.TouchEvent<HTMLDivElement>
-        ) => {
-            if (event.target === event.currentTarget) {
-                event.preventDefault();
-                event.stopPropagation();
-                onClose();
-            }
-        },
-        [onClose]
-    );
+    // Unified close handler with debouncing
+    const handleClose = useCallback(() => {
+        if (isClosing) return;
+        
+        setIsClosing(true);
+        
+        // Clear any existing timeout
+        if (closeTimeoutRef.current) {
+            clearTimeout(closeTimeoutRef.current);
+        }
+        
+        // Small delay to ensure proper cleanup
+        closeTimeoutRef.current = setTimeout(() => {
+            onClose();
+        }, 100);
+    }, [onClose, isClosing]);
+
+    // Mobile-first unified interaction handler
+    const handleInteraction = useCallback((
+        event: React.MouseEvent | React.TouchEvent,
+        action: 'close' | 'backdrop'
+    ) => {
+        event.preventDefault();
+        event.stopPropagation();
+        
+        // Prevent multiple rapid interactions
+        if (isClosing) return;
+        
+        // For touch events, add haptic feedback if available
+        if ('vibrate' in navigator && event.type.includes('touch')) {
+            navigator.vibrate(50);
+        }
+        
+        if (action === 'close') {
+            handleClose();
+        } else if (action === 'backdrop' && event.target === event.currentTarget) {
+            handleClose();
+        }
+    }, [handleClose, isClosing]);
 
     // Prevent image interactions
-    const handleImageInteraction = useCallback(
-        (event: React.MouseEvent | React.TouchEvent) => {
-            event.preventDefault();
-            event.stopPropagation();
-        },
-        []
-    );
+    const handleImageInteraction = useCallback((
+        event: React.MouseEvent | React.TouchEvent
+    ) => {
+        event.preventDefault();
+        event.stopPropagation();
+    }, []);
 
-    // Enhanced close button handling for both mouse and touch
-    const handleCloseInteraction = useCallback(
-        (event: React.MouseEvent | React.TouchEvent) => {
-            event.preventDefault();
-            event.stopPropagation();
-            
-            // For touch events, add a small delay to prevent conflicts
-            if (event.type === 'touchend') {
-                setTimeout(() => {
-                    onClose();
-                }, 50);
-            } else {
-                onClose();
-            }
-        },
-        [onClose]
-    );
-
-    // Don't render on server
+    // Don't render on server or when closing
     if (!isMounted || typeof window === "undefined") {
         return null;
     }
 
     const fullScreenContent = (
         <div
-            className="fixed inset-0 bg-black/95 flex items-center justify-center p-4"
+            className={`fixed inset-0 bg-black/95 flex items-center justify-center p-4 transition-opacity duration-300 ${
+                isClosing ? 'opacity-0' : 'opacity-100'
+            }`}
             style={{
                 zIndex: 99999,
                 position: "fixed",
@@ -131,42 +153,59 @@ function FullScreenImageViewer({
                 left: 0,
                 right: 0,
                 bottom: 0,
-                touchAction: "none", // Prevent mobile scrolling/zooming
+                touchAction: "none",
+                WebkitTouchCallout: "none",
+                WebkitUserSelect: "none",
+                userSelect: "none",
             }}
-            onClick={handleBackdropInteraction}
-            onTouchEnd={handleBackdropInteraction} // Add touch support
+            onClick={(e) => handleInteraction(e, 'backdrop')}
+            onTouchEnd={(e) => handleInteraction(e, 'backdrop')}
             role="dialog"
             aria-modal="true"
             aria-label="Full screen image view"
         >
-            {/* Close button with enhanced mobile support */}
+            {/* Close button with mobile-optimized touch target */}
             <button
                 type="button"
-                onClick={handleCloseInteraction}
-                onTouchStart={handleCloseInteraction} // Changed from onTouchEnd
-                className="absolute top-4 right-4 p-3 rounded-full bg-gray-900/90 hover:bg-gray-800/95 text-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 shadow-lg active:scale-95"
+                onClick={(e) => handleInteraction(e, 'close')}
+                onTouchEnd={(e) => handleInteraction(e, 'close')}
+                disabled={isClosing}
+                className={`absolute top-4 right-4 p-4 rounded-full bg-gray-900/90 hover:bg-gray-800/95 text-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 shadow-lg ${
+                    isClosing ? 'opacity-50 cursor-not-allowed' : 'active:scale-95 cursor-pointer'
+                }`}
                 style={{
                     zIndex: 100001,
                     touchAction: "manipulation",
                     WebkitTapHighlightColor: "transparent",
+                    WebkitTouchCallout: "none",
+                    WebkitUserSelect: "none",
+                    userSelect: "none",
+                    minWidth: "48px",
+                    minHeight: "48px",
                 }}
                 aria-label="Close full screen view"
             >
                 <X className="w-6 h-6" />
             </button>
 
-            {/* Zoom out button with enhanced mobile support */}
+            {/* Zoom out button with mobile-optimized touch target */}
             <button
                 type="button"
-                onClick={handleCloseInteraction}
-                onTouchStart={(e) => e.preventDefault()} // Prevent touch highlight
-                onTouchEnd={handleCloseInteraction}
-                className="absolute top-4 left-4 p-3 rounded-full bg-gray-900/90 hover:bg-gray-800/95 text-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 shadow-lg active:scale-95"
+                onClick={(e) => handleInteraction(e, 'close')}
+                onTouchEnd={(e) => handleInteraction(e, 'close')}
+                disabled={isClosing}
+                className={`absolute top-4 left-4 p-4 rounded-full bg-gray-900/90 hover:bg-gray-800/95 text-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 shadow-lg ${
+                    isClosing ? 'opacity-50 cursor-not-allowed' : 'active:scale-95 cursor-pointer'
+                }`}
                 style={{
                     zIndex: 100001,
                     touchAction: "manipulation",
                     WebkitTapHighlightColor: "transparent",
-                    userSelect: "none", // Prevent text selection
+                    WebkitTouchCallout: "none",
+                    WebkitUserSelect: "none",
+                    userSelect: "none",
+                    minWidth: "48px",
+                    minHeight: "48px",
                 }}
                 aria-label="Zoom out"
             >
@@ -185,7 +224,9 @@ function FullScreenImageViewer({
                     alt={imageAlt}
                     width={1920}
                     height={1080}
-                    className="max-w-full max-h-full object-contain rounded-lg shadow-2xl"
+                    className={`max-w-full max-h-full object-contain rounded-lg shadow-2xl transition-transform duration-300 ${
+                        isClosing ? 'scale-95' : 'scale-100'
+                    }`}
                     priority
                     quality={90}
                     style={{
@@ -193,12 +234,12 @@ function FullScreenImageViewer({
                         maxHeight: "95vh",
                         userSelect: "none",
                         pointerEvents: "none",
-                        touchAction: "none", // Prevent mobile interactions
+                        touchAction: "none",
+                        WebkitUserSelect: "none",
+                        WebkitTouchCallout: "none",
                     }}
                     draggable={false}
-                    onError={() =>
-                        console.warn("Failed to load full-screen image")
-                    }
+                    onError={() => console.warn("Failed to load full-screen image")}
                 />
             </div>
 
@@ -208,7 +249,6 @@ function FullScreenImageViewer({
                 style={{ zIndex: 100001 }}
             >
                 <span className="text-white text-sm font-medium">
-                    {/* Show different instructions for mobile vs desktop */}
                     <span className="hidden sm:inline">
                         Press ESC, click X, or click outside to close
                     </span>
@@ -374,7 +414,15 @@ export function HackathonsSection() {
 
             event.preventDefault();
             event.stopPropagation();
-            openFullScreenImage();
+            
+            // Add small delay for touch events to prevent conflicts
+            if (event.type === 'touchend') {
+                setTimeout(() => {
+                    openFullScreenImage();
+                }, 50);
+            } else {
+                openFullScreenImage();
+            }
         },
         [fullScreenImage, openFullScreenImage]
     );
@@ -633,47 +681,41 @@ export function HackathonsSection() {
                                                     {/* Main image with enhanced click/touch to expand */}
                                                     <div
                                                         className={`w-full h-full relative ${
-                                                            fullScreenImage
-                                                                ? "cursor-default"
-                                                                : "cursor-pointer"
+                                                            fullScreenImage ? "cursor-default" : "cursor-pointer"
                                                         }`}
-                                                        onClick={
-                                                            handleImageExpand
-                                                        }
-                                                        onTouchEnd={
-                                                            handleImageExpand
-                                                        }
+                                                        onClick={handleImageExpand}
+                                                        onTouchEnd={handleImageExpand}
                                                         style={{
-                                                            touchAction:
-                                                                "manipulation",
+                                                            touchAction: "manipulation",
+                                                            WebkitTapHighlightColor: "transparent",
+                                                            WebkitUserSelect: "none",
+                                                            userSelect: "none",
                                                         }}
                                                     >
                                                         <Image
                                                             src={
-                                                                selectedHackathon
-                                                                    .photos[
-                                                                    currentPhotoIndex
-                                                                ]?.url ||
+                                                                selectedHackathon.photos[currentPhotoIndex]?.url ||
                                                                 "/placeholder.svg"
                                                             }
                                                             alt={
-                                                                selectedHackathon
-                                                                    .photos[
-                                                                    currentPhotoIndex
-                                                                ]?.alt ||
+                                                                selectedHackathon.photos[currentPhotoIndex]?.alt ||
                                                                 "Hackathon photo"
                                                             }
                                                             width={800}
                                                             height={400}
                                                             className={`w-full h-full object-cover transition-transform duration-300 ${
-                                                                fullScreenImage
-                                                                    ? ""
-                                                                    : "group-hover:scale-105"
+                                                                fullScreenImage ? "" : "group-hover:scale-105"
                                                             }`}
                                                             loading="lazy"
+                                                            style={{
+                                                                userSelect: "none",
+                                                                WebkitUserSelect: "none",
+                                                                WebkitTouchCallout: "none",
+                                                            }}
+                                                            draggable={false}
                                                         />
 
-                                                        {/* Expand indicator - only show when not in full-screen */}
+                                                        {/* Rest of the image container content remains the same */}
                                                         {!fullScreenImage && (
                                                             <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                                                                 <div className="bg-gray-900/80 backdrop-blur-sm rounded-full p-2">
@@ -682,22 +724,13 @@ export function HackathonsSection() {
                                                             </div>
                                                         )}
 
-                                                        {/* Click hint - only show when not in full-screen */}
                                                         {!fullScreenImage && (
                                                             <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/20">
                                                                 <div className="bg-gray-900/90 backdrop-blur-sm rounded-full px-4 py-2 flex items-center gap-2">
                                                                     <Maximize2 className="w-4 h-4 text-white" />
                                                                     <span className="text-white text-sm font-medium">
-                                                                        <span className="hidden sm:inline">
-                                                                            Clique
-                                                                            para
-                                                                            expandir
-                                                                        </span>
-                                                                        <span className="sm:hidden">
-                                                                            Toque
-                                                                            para
-                                                                            expandir
-                                                                        </span>
+                                                                        <span className="hidden sm:inline">Clique para expandir</span>
+                                                                        <span className="sm:hidden">Toque para expandir</span>
                                                                     </span>
                                                                 </div>
                                                             </div>

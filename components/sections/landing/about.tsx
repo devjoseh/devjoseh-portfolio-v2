@@ -87,21 +87,22 @@ export function AboutSection() {
                         {/* Social Links */}
                         <div className="grid grid-cols-2 gap-3 max-w-sm mx-auto lg:mx-0">
                             {socialLinks.map((social) => (
-                                <Link
+                                <Button
                                     key={social.name}
-                                    href={social.url}
-                                    target="_blank"
+                                    asChild
+                                    variant="outline"
+                                    className={`border-gray-600 bg-gray-800/50 text-gray-300 transition-all duration-300 ${social.color} flex items-center gap-2 justify-start px-4 py-3 h-auto backdrop-blur-sm`}
                                 >
-                                    <Button
-                                        variant="outline"
-                                        className={`border-gray-600 bg-gray-800/50 text-gray-300 transition-all duration-300 ${social.color} flex items-center gap-2 justify-start px-4 py-3 h-auto backdrop-blur-sm`}
+                                    <Link
+                                        href={social.url} 
+                                        target="_blank" 
+                                        rel="noopener noreferrer"
+                                        className="flex items-center gap-2"
                                     >
                                         <social.icon className="w-4 h-4" />
-                                        <span className="text-sm font-medium">
-                                            {social.name}
-                                        </span>
-                                    </Button>
-                                </Link>
+                                        <span className="text-sm font-medium">{social.name}</span>
+                                    </Link>
+                                </Button>
                             ))}
                         </div>
 

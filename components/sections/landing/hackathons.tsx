@@ -150,16 +150,6 @@ function FullScreenImageViewer({
                     }
                 />
             </div>
-
-            {/* Instructions */}
-            <div
-                className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-gray-900/90 backdrop-blur-sm rounded-full px-4 py-2 border border-gray-600/50"
-                style={{ zIndex: 100001 }}
-            >
-                <span className="text-white text-sm font-medium">
-                    Press ESC, click X, or click outside to close
-                </span>
-            </div>
         </div>
     );
 

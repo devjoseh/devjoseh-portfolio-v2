@@ -143,14 +143,12 @@ function FullScreenImageViewer({
             <button
                 type="button"
                 onClick={handleCloseInteraction}
-                onTouchStart={(e) => e.preventDefault()} // Prevent touch highlight
-                onTouchEnd={handleCloseInteraction}
+                onTouchStart={handleCloseInteraction} // Changed from onTouchEnd
                 className="absolute top-4 right-4 p-3 rounded-full bg-gray-900/90 hover:bg-gray-800/95 text-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 shadow-lg active:scale-95"
                 style={{
                     zIndex: 100001,
                     touchAction: "manipulation",
                     WebkitTapHighlightColor: "transparent",
-                    userSelect: "none", // Prevent text selection
                 }}
                 aria-label="Close full screen view"
             >

@@ -7,7 +7,6 @@ import { trackLinkClick } from "@/utils/actions/links";
 import { Card } from "@/components/ui/card";
 import { useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
 
 interface LinksPageProps {
     initialLinks: dbLink[];
@@ -44,14 +43,10 @@ export function LinksPage({ initialLinks, profileSettings }: LinksPageProps) {
             )
         );
 
-        // Add a small delay for animation
+        // Add a small delay for animation, then navigate
         setTimeout(() => {
             setIsLoading(null);
-            <Link
-                href={link.url}
-                target="_blank"
-                rel="noopener noreferrer"
-            />
+            window.location.href = link.url;
         }, 300);
     };
 

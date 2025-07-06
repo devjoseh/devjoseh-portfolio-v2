@@ -157,7 +157,7 @@ export function AnalyticsDashboard({
                                                         link.background_color,
                                                 }}
                                             >
-                                                �
+                                                🔗
                                             </div>
                                             <div className="min-w-0 flex-1">
                                                 <p className="font-medium text-white text-sm md:text-base truncate">

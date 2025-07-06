@@ -411,7 +411,7 @@ export function LinksManager({
                                                         }}
                                                         className="text-sm"
                                                     >
-                                                        �
+                                                        🔗
                                                     </span>
                                                 </div>
                                                 <div className="min-w-0 flex-1">
@@ -501,7 +501,7 @@ export function LinksManager({
                                                             color: link.text_color,
                                                         }}
                                                     >
-                                                        �
+                                                        🔗
                                                     </span>
                                                 </div>
                                                 <div>

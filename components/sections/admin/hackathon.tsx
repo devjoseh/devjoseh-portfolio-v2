@@ -271,7 +271,7 @@ export function HackathonManager({ initialHackathons }: HackathonManagerProps) {
 
                 <div className="text-xs text-gray-400 bg-gray-800/50 p-3 rounded-lg">
                     <p className="font-medium mb-1">
-                        � Dicas para adicionar fotos:
+                        💡 Dicas para adicionar fotos:
                     </p>
                     <ul className="space-y-1 text-xs">
                         <li>

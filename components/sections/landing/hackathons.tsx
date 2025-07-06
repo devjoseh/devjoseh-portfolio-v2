@@ -165,8 +165,7 @@ function FullScreenImageViewer({
             aria-label="Full screen image view"
         >
             {/* Close button with mobile-optimized touch target */}
-            <button
-                type="button"
+            <Button
                 onClick={(e) => handleInteraction(e, 'close')}
                 onTouchEnd={(e) => handleInteraction(e, 'close')}
                 disabled={isClosing}
@@ -174,7 +173,7 @@ function FullScreenImageViewer({
                     isClosing ? 'opacity-50 cursor-not-allowed' : 'active:scale-95 cursor-pointer'
                 }`}
                 style={{
-                    zIndex: 100001,
+                    zIndex: 9999999999999,
                     touchAction: "manipulation",
                     WebkitTapHighlightColor: "transparent",
                     WebkitTouchCallout: "none",
@@ -186,31 +185,7 @@ function FullScreenImageViewer({
                 aria-label="Close full screen view"
             >
                 <X className="w-6 h-6" />
-            </button>
-
-            {/* Zoom out button with mobile-optimized touch target */}
-            <button
-                type="button"
-                onClick={(e) => handleInteraction(e, 'close')}
-                onTouchEnd={(e) => handleInteraction(e, 'close')}
-                disabled={isClosing}
-                className={`absolute top-4 left-4 p-4 rounded-full bg-gray-900/90 hover:bg-gray-800/95 text-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 shadow-lg ${
-                    isClosing ? 'opacity-50 cursor-not-allowed' : 'active:scale-95 cursor-pointer'
-                }`}
-                style={{
-                    zIndex: 100001,
-                    touchAction: "manipulation",
-                    WebkitTapHighlightColor: "transparent",
-                    WebkitTouchCallout: "none",
-                    WebkitUserSelect: "none",
-                    userSelect: "none",
-                    minWidth: "48px",
-                    minHeight: "48px",
-                }}
-                aria-label="Zoom out"
-            >
-                <Maximize2 className="w-6 h-6 rotate-180" />
-            </button>
+            </Button>
 
             {/* Image container with improved mobile handling */}
             <div
@@ -241,21 +216,6 @@ function FullScreenImageViewer({
                     draggable={false}
                     onError={() => console.warn("Failed to load full-screen image")}
                 />
-            </div>
-
-            {/* Instructions with mobile-specific text */}
-            <div
-                className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-gray-900/90 backdrop-blur-sm rounded-full px-4 py-2 border border-gray-600/50"
-                style={{ zIndex: 100001 }}
-            >
-                <span className="text-white text-sm font-medium">
-                    <span className="hidden sm:inline">
-                        Press ESC, click X, or click outside to close
-                    </span>
-                    <span className="sm:hidden">
-                        Tap X or tap outside to close
-                    </span>
-                </span>
             </div>
         </div>
     );

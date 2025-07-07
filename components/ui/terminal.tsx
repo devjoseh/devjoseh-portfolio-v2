@@ -249,15 +249,15 @@ const commands = {
                                 <TypeAnimation
                                     sequence={[
                                         "Inicializando sistema...",
-                                        1000,
+                                        400,
                                         "Carregando perfil do desenvolvedor...",
-                                        1000,
+                                        400,
                                         "Sistema pronto! 🚀",
-                                        1000,
+                                        400,
                                         () => setIsTyping(false),
                                     ]}
                                     wrapper="span"
-                                    speed={50}
+                                    speed={60}
                                     style={{
                                         fontSize: "1em",
                                         display: "inline-block",

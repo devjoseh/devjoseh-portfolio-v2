@@ -19,7 +19,7 @@ export function KonamiEasterEgg() {
             // Show success message
             const successMessage = document.createElement("div");
             successMessage.innerHTML =
-                "🕶️ Matrix Mode Activated! Welcome to the real world, Neo...";
+                "🕶️ Modo Matrix Ativado! Bem-vindo ao mundo real, Neo...";
             successMessage.className =
                 "fixed top-4 left-1/2 transform -translate-x-1/2 bg-black text-green-400 px-6 py-3 rounded-lg font-mono text-sm z-50 border border-green-400";
             document.body.appendChild(successMessage);
@@ -44,8 +44,7 @@ export function KonamiEasterEgg() {
         matrixContainer.className = "matrix-rain";
         document.body.appendChild(matrixContainer);
 
-        const characters =
-            "アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        const characters = "アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
         for (let i = 0; i < 50; i++) {
             const column = document.createElement("div");

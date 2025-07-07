@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/ui/logo";
+import { CommandPaletteTrigger } from "../../ui/command-palette-trigger";
 import { Menu, X, Download } from "lucide-react";
 
 export function Navigation() {
@@ -51,8 +52,9 @@ export function Navigation() {
     };
 
     const downloadResume = () => {
+        // Create a temporary link to download the resume
         const link = document.createElement("a");
-        link.href = "/curriculo_jose_hernanes.pdf";
+        link.href = "/curriculo_jose_hernanes.pdf"; // You'll need to add your resume PDF to the public folder
         link.download = "DevJoseH_Curriculo.pdf";
         document.body.appendChild(link);
         link.click();
@@ -103,8 +105,12 @@ export function Navigation() {
                         </div>
                     </div>
 
-                    {/* Download Resume Button */}
-                    <div className="hidden md:flex">
+                    {/* Right side actions */}
+                    <div className="hidden md:flex items-center gap-4">
+                        {/* Command Palette Trigger */}
+                        <CommandPaletteTrigger />
+
+                        {/* Download Resume Button */}
                         <Button
                             onClick={downloadResume}
                             className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-4 py-2 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg text-sm lg:text-base"

@@ -1,6 +1,7 @@
-import type React from "react";
-import type { Metadata } from "next";
+import { CommandPaletteProvider } from "@/components/ui/command-palette-provider"
 import { Inter } from "next/font/google";
+import type { Metadata } from "next";
+import type React from "react";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -101,7 +102,9 @@ export default function RootLayout({
                     }}
                 />
             </head>
-            <body className={inter.className}>{children}</body>
+            <body className={inter.className}>
+                <CommandPaletteProvider>{children}</CommandPaletteProvider>
+            </body>
         </html>
     );
 }

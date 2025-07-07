@@ -4,14 +4,8 @@ import { Plus, Edit, Trash2, GripVertical, Save, Building2, Calendar, MapPin, Mo
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { createExperience, updateExperience, deleteExperience, reorderExperiences } from "@/utils/actions/admin";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Textarea, Switch, Button, Input, Badge, Label, Card, CardContent } from "@/components/index";
 import type { Experiences as Experience } from "@/utils/supabase/types"
-import { Card, CardContent } from "@/components/ui/card";
-import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import Image from "next/image";
 import type React from "react";

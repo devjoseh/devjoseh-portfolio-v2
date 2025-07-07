@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Logo } from "@/components/ui/logo";
 import { CommandPaletteTrigger } from "../../ui/command-palette-trigger";
 import { Menu, X, Download } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useState, useEffect } from "react";
+import { Logo } from "@/components/ui/logo";
+import { appConfig } from "@/config";
 
 export function Navigation() {
     const [isScrolled, setIsScrolled] = useState(false);
@@ -52,9 +53,8 @@ export function Navigation() {
     };
 
     const downloadResume = () => {
-        // Create a temporary link to download the resume
         const link = document.createElement("a");
-        link.href = "/curriculo_jose_hernanes.pdf"; // You'll need to add your resume PDF to the public folder
+        link.href = appConfig.curriculumPath;
         link.download = "DevJoseH_Curriculo.pdf";
         document.body.appendChild(link);
         link.click();

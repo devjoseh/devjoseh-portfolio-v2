@@ -1,7 +1,8 @@
 import { MetadataRoute } from "next";
+import { appConfig } from "@/config";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-    const baseUrl = `https://devjoseh.com.br`
+    const baseUrl = appConfig.baseUrl;
     
     return [
         {

@@ -214,7 +214,7 @@ export function LinksPage({ initialLinks, profileSettings }: LinksPageProps) {
                         Criado com ❤️ por DevJoseH
                     </p>
                     <p className="text-gray-500 text-xs mt-1">
-                        © 2025 Todos os direitos reservados
+                        © {new Date().getFullYear()} Todos os direitos reservados
                     </p>
                 </div>
             </div>

@@ -3,6 +3,7 @@
 import { Search, Home, User, Code, Briefcase, FolderOpen, Trophy, Link, Download, Github, Mail, X, Keyboard } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { appConfig } from "@/config";
 import { Command } from "cmdk";
 
 interface CommandPaletteProps {
@@ -32,7 +33,7 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
 
     const downloadResume = () => {
         const link = document.createElement("a");
-        link.href = "/curriculo_jose_hernanes.pdf";
+        link.href = appConfig.curriculumPath;
         link.download = "DevJoseH_Curriculo.pdf";
         document.body.appendChild(link);
         link.click();

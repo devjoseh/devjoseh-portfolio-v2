@@ -97,17 +97,17 @@ export async function trackLinkClick(
     const supabase = await createClient();
 
     try {
-        // Increment click count
         await supabase.rpc("increment_link_clicks", { link_id: linkId });
 
-        // Record click analytics
-        await supabase.from("link_clicks").insert([
-            {
-                link_id: linkId,
-                user_agent: userAgent,
-                referrer: referrer,
-            },
-        ]);
+        await supabase
+            .from("link_clicks")
+            .insert([
+                {
+                    link_id: linkId,
+                    user_agent: userAgent,
+                    referrer: referrer,
+                },
+            ]);
     } catch (error) {
         console.error("Error tracking link click:", error);
     }
@@ -137,7 +137,9 @@ export async function createLink(
 ): Promise<boolean> {
     const supabase = await createClient();
 
-    const { error } = await supabase.from("links").insert([link]);
+    const { error } = await supabase
+        .from("links")
+        .insert([link]);
 
     if (error) {
         console.error("Error creating link:", error);
@@ -150,7 +152,10 @@ export async function createLink(
 export async function deleteLink(linkId: string): Promise<boolean> {
     const supabase = await createClient();
 
-    const { error } = await supabase.from("links").delete().eq("id", linkId);
+    const { error } = await supabase
+        .from("links")
+        .delete()
+        .eq("id", linkId);
 
     if (error) {
         console.error("Error deleting link:", error);
@@ -183,19 +188,14 @@ export async function getLinkAnalytics(days = 30): Promise<any[]> {
 
     const { data, error } = await supabase
         .from("link_clicks")
-        .select(
-            `
-      clicked_at,
-      links (
-        title,
-        id
-      )
-    `
-        )
-        .gte(
-            "clicked_at",
-            new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString()
-        )
+        .select(`
+            clicked_at,
+            links (
+                title,
+                id
+            )
+        `)
+        .gte("clicked_at", new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString())
         .order("clicked_at", { ascending: false });
 
     if (error) {
@@ -215,5 +215,6 @@ export async function reorderLinks(ids: string[]): Promise<boolean> {
         console.error("Error reordering links:", error);
         return false;
     }
+    
     return true;
 }

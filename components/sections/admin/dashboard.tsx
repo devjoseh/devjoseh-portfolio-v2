@@ -7,8 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { Link as dbLink, ProfileSettings } from "@/utils/actions/links";
 import type { Hackathon } from "@/utils/actions/admin";
 import { signOut } from "@/utils/actions/sign-out";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Button, Badge } from "@/components/index";
 import { useState } from "react";
 import Link from "next/link";
 
@@ -92,7 +91,6 @@ export function AdminDashboard({
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-900 to-purple-900/20">
-            {/* Animated background */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
                 <div className="absolute top-20 left-20 w-64 h-64 bg-purple-500/5 rounded-full blur-3xl animate-pulse" />
                 <div className="absolute bottom-20 right-20 w-96 h-96 bg-purple-600/3 rounded-full blur-3xl animate-pulse delay-1000" />
@@ -145,7 +143,6 @@ export function AdminDashboard({
                         onValueChange={setActiveTab}
                         className="space-y-6"
                     >
-                        {/* Enhanced Tab Navigation - Fixed Alignment */}
                         <div className="w-full">
                             <TabsList className="w-full h-auto p-1 bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 rounded-xl shadow-lg">
                                 <div className="grid grid-cols-3 md:grid-cols-6 gap-1 w-full">
@@ -153,16 +150,7 @@ export function AdminDashboard({
                                         <TabsTrigger
                                             key={tab.id}
                                             value={tab.id}
-                                            className={`
-                        relative flex items-center justify-center gap-2 px-3 py-3 md:py-4
-                        rounded-lg transition-all duration-300 font-medium text-xs md:text-sm
-                        min-h-[48px] md:min-h-[56px]
-                        data-[state=active]:bg-purple-600 data-[state=active]:text-white data-[state=active]:shadow-lg
-                        data-[state=inactive]:text-gray-400 data-[state=inactive]:hover:text-gray-200
-                        data-[state=inactive]:hover:bg-gray-700/50
-                        focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500
-                        transform data-[state=active]:scale-[1.02]
-                      `}
+                                            className={`relative flex items-center justify-center gap-2 px-3 py-3 md:py-4 rounded-lg transition-all duration-300 font-medium text-xs md:text-sm min-h-[48px] md:min-h-[56px] data-[state=active]:bg-purple-600 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=inactive]:text-gray-400 data-[state=inactive]:hover:text-gray-200 data-[state=inactive]:hover:bg-gray-700/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 transform data-[state=active]:scale-[1.02]`}
                                         >
                                             <tab.icon
                                                 className={`w-4 h-4 flex-shrink-0 transition-colors duration-300 ${

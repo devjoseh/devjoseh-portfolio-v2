@@ -29,20 +29,17 @@ export default function NotFound() {
                 setIsGlitching(true);
                 let iterations = 0;
                 const glitchTimer = setInterval(() => {
-                    setGlitchText(
-                        originalText
-                            .split("")
-                            .map((char) => {
-                                if (iterations < 3 && Math.random() > 0.7) {
-                                    return glitchChars[
-                                        Math.floor(
-                                            Math.random() * glitchChars.length
-                                        )
-                                    ];
-                                }
-                                return char;
-                            })
-                            .join("")
+                    setGlitchText(originalText
+                        .split("")
+                        .map((char) => {
+                            if (iterations < 3 && Math.random() > 0.7) {
+                                return glitchChars[
+                                    Math.floor(Math.random() * glitchChars.length)
+                                ];
+                            }
+                            return char;
+                        })
+                        .join("")
                     );
                     iterations++;
                     if (iterations > 5) {
@@ -364,7 +361,7 @@ export default function NotFound() {
             {/* Footer */}
             <footer className="relative z-10 text-center p-6 text-gray-400 text-sm">
                 <p>
-                    © 2025 DevJoseH. Até os 404s podem ser uma experiência
+                    © {new Date().getFullYear()} DevJoseH. Até os 404s podem ser uma experiência
                     incrível! ✨
                 </p>
             </footer>

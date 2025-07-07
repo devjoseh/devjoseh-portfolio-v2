@@ -1,4 +1,5 @@
 import { MetadataRoute } from "next";
+import { appConfig } from "@/config";
 
 export default function robots(): MetadataRoute.Robots {
     return {
@@ -6,9 +7,9 @@ export default function robots(): MetadataRoute.Robots {
             {
                 userAgent: "*",
                 allow: "/",
-                disallow: ["/admin"]
+                disallow: appConfig.routes.protected
             }
         ],
-        sitemap: `https://devjoseh.com.br/sitemap.xml`,
+        sitemap: `${appConfig.baseUrl}/sitemap.xml`,
     }
 }

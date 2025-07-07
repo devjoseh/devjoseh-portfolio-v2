@@ -2,7 +2,6 @@
 
 import { createBypassClient } from "../supabase/bypass";
 
-// Extend the database types
 export interface Hackathon {
     id: string;
     title: string;
@@ -46,7 +45,7 @@ type Experience = {
     created_at: string
 }
 
-// Hackathon functions
+// HACKATHONS
 export async function getHackathons(): Promise<Hackathon[]> {
     const supabase = createBypassClient();
 
@@ -68,7 +67,9 @@ export async function createHackathon(
 ): Promise<boolean> {
     const supabase = createBypassClient();
 
-    const { error } = await supabase.from("hackathons").insert([hackathon]);
+    const { error } = await supabase
+        .from("hackathons")
+        .insert([hackathon]);
 
     if (error) {
         console.error("Error creating hackathon:", error);
@@ -100,7 +101,10 @@ export async function updateHackathon(
 export async function deleteHackathon(id: string): Promise<boolean> {
     const supabase = createBypassClient();
 
-    const { error } = await supabase.from("hackathons").delete().eq("id", id);
+    const { error } = await supabase
+        .from("hackathons")
+        .delete()
+        .eq("id", id);
 
     if (error) {
         console.error("Error deleting hackathon:", error);
@@ -125,13 +129,15 @@ export async function reorderHackathons(ids: string[]): Promise<boolean> {
     return true;
 }
 
-// Project functions
+// PROJECTS
 export async function createProject(
     project: Omit<Project, "id" | "created_at" | "updated_at">
 ): Promise<boolean> {
     const supabase = createBypassClient();
 
-    const { error } = await supabase.from("projects").insert([project]);
+    const { error } = await supabase
+        .from("projects")
+        .insert([project]);
 
     if (error) {
         console.error("Error creating project:", error);
@@ -163,7 +169,10 @@ export async function updateProject(
 export async function deleteProject(id: string): Promise<boolean> {
     const supabase = createBypassClient();
 
-    const { error } = await supabase.from("projects").delete().eq("id", id);
+    const { error } = await supabase
+        .from("projects")
+        .delete()
+        .eq("id", id);
 
     if (error) {
         console.error("Error deleting project:", error);
@@ -188,13 +197,15 @@ export async function reorderProjects(ids: string[]): Promise<boolean> {
     return true;
 }
 
-// Experience functions
+// EXPERIENCES
 export async function createExperience(
     experience: Omit<Experience, "id" | "created_at">
 ): Promise<boolean> {
     const supabase = createBypassClient();
 
-    const { error } = await supabase.from("experiences").insert([experience]);
+    const { error } = await supabase
+        .from("experiences")
+        .insert([experience]);
 
     if (error) {
         console.error("Error creating experience:", error);
@@ -226,7 +237,10 @@ export async function updateExperience(
 export async function deleteExperience(id: string): Promise<boolean> {
     const supabase = createBypassClient();
 
-    const { error } = await supabase.from("experiences").delete().eq("id", id);
+    const { error } = await supabase
+        .from("experiences")
+        .delete()
+        .eq("id", id);
 
     if (error) {
         console.error("Error deleting experience:", error);
@@ -251,7 +265,7 @@ export async function reorderExperiences(ids: string[]): Promise<boolean> {
     return true;
 }
 
-// Reorder links function
+// LINKS
 export async function reorderLinks(ids: string[]): Promise<boolean> {
     const supabase = createBypassClient();
     

@@ -47,7 +47,7 @@ export function CommandPaletteProvider({
 
         document.addEventListener("keydown", handleKeyDown);
         return () => document.removeEventListener("keydown", handleKeyDown);
-    }, []); // Removed toggle from the dependency array
+    }, []);
 
     return (
         <CommandPaletteContext.Provider value={{ isOpen, open, close, toggle }}>

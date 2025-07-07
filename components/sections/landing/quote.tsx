@@ -4,7 +4,6 @@ export function QuoteSection() {
             <div className="container mx-auto px-0">
                 <div className="max-w-4xl mx-auto text-center">
                     <div className="relative">
-                        {/* Responsive Quote marks */}
                         <div className="absolute -top-2 -left-2 sm:-top-3 sm:-left-3 md:-top-4 md:-left-4 text-4xl sm:text-5xl md:text-6xl lg:text-8xl text-purple-500/20 font-serif leading-none select-none">
                             &quot;
                         </div>
@@ -12,7 +11,6 @@ export function QuoteSection() {
                             &quot;
                         </div>
 
-                        {/* Quote content with responsive padding */}
                         <blockquote className="relative z-10 px-6 sm:px-8 md:px-12 lg:px-16">
                             <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-light text-gray-200 leading-relaxed mb-4 sm:mb-5 md:mb-6 italic">
                                 Se a educação sozinha não transforma a

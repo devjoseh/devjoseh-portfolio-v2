@@ -4,19 +4,11 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Plus, Edit, Trash2, GripVertical, Save, Github, ExternalLink, Star, MoreVertical } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { createProject, updateProject, deleteProject, reorderProjects } from "@/utils/actions/admin";
-import { Card, CardContent } from "@/components/ui/card";
-import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
+import { Textarea, Button, Switch, Label, Input, Badge, Card, CardContent } from "@/components/index";
+import type { Projects as Project } from "@/utils/supabase/types" 
 import { useState } from "react";
 import type React from "react";
-
 import Image from "next/image";
-
-import type { Projects as Project } from "@/utils/supabase/types" 
 import Link from "next/link";
 
 interface ProjectManagerProps {

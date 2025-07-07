@@ -2,6 +2,7 @@ import { CommandPaletteProvider } from "@/components/ui/command-palette-provider
 import { KonamiEasterEgg } from "@/components/sections/landing/konami-easter-egg"
 import { Inter } from "next/font/google";
 import type { Metadata } from "next";
+import { appConfig } from "@/config";
 import type React from "react";
 import "./globals.css";
 
@@ -34,14 +35,14 @@ export const metadata: Metadata = {
         address: false,
         telephone: false
     },
-    metadataBase: new URL("https://devjoseh.com.br"),
+    metadataBase: new URL(appConfig.baseUrl),
     alternates: {
         canonical: "/",
     },
     openGraph: {
         title: "DevJoseH - Portfólio Desenvolvedor Backend",
         description: "Portfolio pessoal de José Hernanes, desenvolvedor back-end e entusiasta de tecnologia.",
-        url: "https://devjoseh.com.br",
+        url: appConfig.baseUrl,
         siteName: "DevJoseH",
         images: [
             {
@@ -57,7 +58,7 @@ export const metadata: Metadata = {
         card: "summary_large_image",
         title: "DevJoseH - Portfólio Desenvolvedor Backend",
         description: "Portfolio pessoal de José Hernanes, desenvolvedor back-end e entusiasta de tecnologia.",
-        images: ["https://devjoseh.com.br/banner.png"],
+        images: [`${appConfig.baseUrl}/banner.png`],
     },
     robots: {
         index: true,
@@ -82,7 +83,7 @@ export default function RootLayout({
                                 {
                                     "@type": "Person",
                                     "name": "José Hernanes",
-                                    "url": "https://devjoseh.com.br",
+                                    "url": appConfig.baseUrl,
                                     "sameAs": [
                                         "https://github.com/devjoseh",
                                         "https://www.linkedin.com/in/devjoseh/"
@@ -91,9 +92,9 @@ export default function RootLayout({
                                 {
                                     "@type": "WebSite",
                                     "name": "DevJoseH - Portfólio Desenvolvedor Backend",
-                                    "url": "https://devjoseh.com.br",
+                                    "url": appConfig.baseUrl,
                                     "publisher": {
-                                        "@id": "https://devjoseh.com.br/#person"
+                                        "@id": `${appConfig.baseUrl}/#person`
                                     },
                                     "inLanguage": "pt-BR",
                                     "description": "Portfolio pessoal de José Hernanes, desenvolvedor back-end e entusiasta de tecnologia."

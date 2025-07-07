@@ -14,14 +14,11 @@ export function HeroSection() {
     }, []);
 
     const scrollToProjects = () => {
-        document
-            .getElementById("projects")
-            ?.scrollIntoView({ behavior: "smooth" });
+        document.getElementById("projects")?.scrollIntoView({ behavior: "smooth" });
     };
 
     return (
         <section className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900">
-            {/* Enhanced Animated background elements - Full width */}
             <div className="absolute inset-0 overflow-hidden">
                 <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl animate-pulse" />
                 <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-600/5 rounded-full blur-3xl animate-pulse delay-1000" />
@@ -38,37 +35,28 @@ export function HeroSection() {
                 <div className="absolute inset-0 bg-gradient-to-l from-transparent via-purple-600/1 to-transparent animate-pulse duration-6000 delay-2000" />
             </div>
 
-            {/* Content with proper margins and mobile layout fixes */}
             <div className="container mx-auto px-4 md:px-8 lg:px-12 xl:px-16 z-10 w-full">
                 {/* Mobile: Stack vertically with proper spacing, Desktop: Side by side */}
                 <div className="flex flex-col lg:grid lg:grid-cols-2 gap-8 lg:gap-12 items-center justify-center min-h-[calc(100vh-8rem)]">
-                    {/* Main content - Original sizes restored */}
                     <div
                         className={`w-full text-center lg:text-left order-1 lg:order-1 transition-all duration-1000 ${
-                            isVisible
-                                ? "opacity-100 translate-y-0"
-                                : "opacity-0 translate-y-10"
+                            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
                         }`}
                     >
-                        {/* Name and title section - Original typography restored */}
                         <div className="mb-8 space-y-2">
-                            {/* Large prominent DevJoseH - Original sizes */}
                             <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-white via-purple-200 to-purple-400 bg-clip-text text-transparent leading-tight">
                                 DevJoseH
                             </h1>
 
-                            {/* Medium-sized José Hernanes - Original sizes */}
                             <h2 className="text-2xl md:text-4xl font-semibold text-gray-200 leading-tight">
                                 José Hernanes
                             </h2>
 
-                            {/* Smaller Desenvolvedor Back-end - Original sizes */}
                             <p className="text-lg md:text-xl text-purple-400 font-medium">
                                 Desenvolvedor Back-end
                             </p>
                         </div>
 
-                        {/* Action buttons - Original sizes and layout restored */}
                         <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start items-center mb-12">
                             <Button
                                 onClick={scrollToProjects}
@@ -117,23 +105,17 @@ export function HeroSection() {
                             </div>
                         </div>
 
-                        {/* Scroll indicator - Original positioning */}
                         <div className="animate-bounce text-center lg:text-left">
                             <ArrowDown className="w-6 h-6 text-purple-400 mx-auto lg:mx-0" />
                         </div>
                     </div>
 
-                    {/* Interactive Terminal - Mobile positioning optimized */}
                     <div
                         className={`w-full order-2 lg:order-2 transition-all duration-1000 delay-300 ${
-                            isVisible
-                                ? "opacity-100 translate-x-0"
-                                : "opacity-0 translate-x-10"
+                            isVisible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-10"
                         }`}
                     >
-                        {/* Mobile: Center terminal with constraints, Desktop: Right align */}
                         <div className="flex justify-center lg:justify-end">
-                            {/* Terminal with mobile-specific constraints to prevent layout disruption */}
                             <div className="w-full max-w-sm sm:max-w-md lg:max-w-lg xl:max-w-xl mobile-terminal-wrapper">
                                 <Terminal className="w-full" />
                             </div>
@@ -142,10 +124,8 @@ export function HeroSection() {
                 </div>
             </div>
 
-            {/* Seamless transition element */}
             <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-b from-transparent via-gray-900/50 to-gray-900 pointer-events-none" />
 
-            {/* Extended background elements for smooth transition */}
             <div className="absolute bottom-0 left-0 right-0 h-40 overflow-hidden pointer-events-none">
                 <div className="absolute bottom-0 left-1/4 w-48 h-48 bg-purple-500/3 rounded-full blur-3xl animate-pulse delay-2000" />
                 <div className="absolute bottom-0 right-1/3 w-32 h-32 bg-purple-600/5 rounded-full blur-2xl animate-pulse delay-3000" />

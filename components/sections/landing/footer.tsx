@@ -86,7 +86,7 @@ export function Footer() {
 
                 <div className="border-t border-gray-800 mt-6 md:mt-8 pt-6 md:pt-8 text-center">
                     <p className="text-gray-400 text-xs md:text-sm">
-                        © 2025 DevJoseH. Todos os direitos reservados.
+                        © {new Date().getFullYear()} DevJoseH. Todos os direitos reservados.
                     </p>
                 </div>
             </div>

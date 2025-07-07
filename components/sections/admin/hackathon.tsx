@@ -5,14 +5,8 @@ import { Plus, Edit, Trash2, GripVertical, Save, Trophy, Calendar, MoreVertical,
 import { createHackathon, updateHackathon, deleteHackathon, reorderHackathons } from "@/utils/actions/admin";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Card, CardContent } from "@/components/ui/card";
+import { Textarea, Switch, Button, Badge, Label, Input, Card, CardContent } from "@/components/index";
 import type { Hackathon } from "@/utils/actions/admin";
-import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import Image from "next/image";
 import type React from "react";

@@ -39,7 +39,6 @@ type Experience = {
     created_at: string
 }
 
-// Hackathon interface to match the component expectations
 export interface Hackathon {
     id: string;
     title: string;
@@ -98,7 +97,6 @@ export async function getHackathons(): Promise<Hackathon[]> {
         return [];
     }
 
-    // Transform database data to match component interface
     return (data || []).map((hackathon) => ({
         id: hackathon.id,
         title: hackathon.title,
@@ -151,15 +149,17 @@ export async function submitContactMessage(
 ): Promise<boolean> {
     const supabase = await createClient();
 
-    const { error } = await supabase.from("contact_messages").insert([
-        {
-            name,
-            email,
-            subject,
-            message,
-            status: "unread",
-        },
-    ]);
+    const { error } = await supabase
+        .from("contact_messages")
+        .insert([
+            {
+                name,
+                email,
+                subject,
+                message,
+                status: "unread",
+            },
+        ]);
 
     if (error) {
         console.error("Error submitting contact message:", error);

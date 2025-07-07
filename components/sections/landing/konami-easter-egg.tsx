@@ -13,10 +13,8 @@ export function KonamiEasterEgg() {
             setIsMatrixMode(true);
             document.body.classList.add("matrix-mode");
 
-            // Create matrix rain effect
             createMatrixRain();
 
-            // Show success message
             const successMessage = document.createElement("div");
             successMessage.innerHTML = "🕶️ Modo Matrix Ativado! Bem-vindo ao mundo real, Neo...";
             successMessage.className = "fixed top-4 left-1/2 transform -translate-x-1/2 bg-black text-green-400 px-6 py-3 rounded-lg font-mono text-sm z-50 border border-green-400";

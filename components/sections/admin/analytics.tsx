@@ -4,8 +4,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp, Calendar, BarChart3, MousePointer } from "lucide-react";
 import type { Link } from "@/utils/actions/links";
-import { Badge } from "@/components/ui/badge";
 import { useState, useMemo } from "react";
+import { Badge } from "@/components/index";
 
 interface AnalyticsDashboardProps {
     links: Link[];

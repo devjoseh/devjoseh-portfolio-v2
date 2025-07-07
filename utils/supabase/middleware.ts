@@ -1,9 +1,10 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
+import { appConfig } from "@/config";
 
-const PROTECTED_ROUTES = ["/admin"];
-const PUBLIC_AUTH_ROUTES = ["/sign-in"];
-const STATIC_ROUTES = ["/api", "/_next", "/favicon.ico"];
+const PROTECTED_ROUTES = appConfig.routes.protected;
+const PUBLIC_AUTH_ROUTES = appConfig.routes.public_auth;
+const STATIC_ROUTES = appConfig.routes.static;
 
 export const updateSession = async (request: NextRequest) => {
     const { pathname } = request.nextUrl;

@@ -1,10 +1,9 @@
 "use client";
 
-import type React from "react";
-
-import { useState, useEffect, useRef } from "react";
-import { TypeAnimation } from "react-type-animation";
 import { TerminalIcon, Minimize2, Square, X } from "lucide-react";
+import { TypeAnimation } from "react-type-animation";
+import { useState, useEffect, useRef } from "react";
+import type React from "react";
 
 interface TerminalProps {
     className?: string;
@@ -161,7 +160,7 @@ const commands = {
                 ]);
             }
         } else if (command === "") {
-            // Empty command, just add prompt
+            // Add anything here
         } else {
             setHistory((prev) => [
                 ...prev,
@@ -236,7 +235,7 @@ const commands = {
                 </div>
             </div>
 
-            {/* Terminal Content - Mobile height optimization */}
+            {/* Terminal Content */}
             {!isMinimized && (
                 <div className="p-4 mobile-terminal-content flex flex-col">
                     <div

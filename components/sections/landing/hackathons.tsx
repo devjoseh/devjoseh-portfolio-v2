@@ -269,6 +269,7 @@ export function HackathonsSection() {
           {/* O Dialog agora gerencia tanto a visualização de detalhes quanto a de tela cheia */}
           <Dialog open={!!selectedHackathon} onOpenChange={handleModalOpenChange}>
             <DialogContent
+              hideCloseButton={isFullScreen}
               className={isFullScreen
                 // Estilos para a visualização em tela cheia
                 ? "p-0 m-0 w-screen h-screen max-w-full max-h-full bg-black/95 border-none rounded-none"

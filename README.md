@@ -67,6 +67,13 @@ Para executar este projeto localmente, você precisará ter o [Node.js](https://
 - **Iniciar o servidor de produção:** `npm run start`
 - **Executar o linter:** `npm run lint`
 
+## 🛠️ Ferramentas Recomendadas
+
+Para otimizar e gerenciar os recursos visuais deste projeto, recomendo as seguintes ferramentas:
+
+- **[Squoosh.app](https://squoosh.app/):** Uma ferramenta online e de código aberto do Google para compressão de imagens. Essencial para reduzir o tamanho dos arquivos de imagem sem perder qualidade, melhorando o tempo de carregamento do site.
+- **[imgbb.com](https://imgbb.com/):** Um serviço de hospedagem de imagens gratuito e fácil de usar. Ideal para hospedar as imagens do seu portfólio e garantir que elas sejam carregadas rapidamente.
+
 ## ✨ Funcionalidades
 
 O portfólio é dividido em duas áreas principais: a página pública e a área administrativa.

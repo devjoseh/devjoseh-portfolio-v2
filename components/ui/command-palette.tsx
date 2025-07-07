@@ -123,7 +123,7 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
                             <Command.Item
                                 onSelect={() =>
                                     handleSelect(() =>
-                                        scrollToSection("skills-tools")
+                                        scrollToSection("skills")
                                     )
                                 }
                                 className="flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer hover:bg-gray-800 text-white transition-colors"

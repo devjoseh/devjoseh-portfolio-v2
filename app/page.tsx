@@ -9,7 +9,7 @@ export default function Home() {
                 <div id="about">
                     <AboutSection />
                 </div>
-                <div id="skills-tools">
+                <div id="skills">
                     <SkillsToolsSection />
                 </div>
                 <div id="experience">

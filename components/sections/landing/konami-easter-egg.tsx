@@ -80,10 +80,9 @@ export function KonamiEasterEgg() {
         <>
             {/* Konami Code Hint - Hidden on mobile */}
             {showHint && !isMatrixMode && (
-                <div className="fixed bottom-4 left-4 bg-black/80 text-green-400 px-3 py-2 rounded-lg font-mono text-xs border border-green-400/30 easter-hint z-40 hidden md:block">
+                <div className="fixed bottom-4 left-4 text-green-400 px-3 py-2 rounded-lg font-mono text-xs easter-hint z-40 hidden md:block">
                     <div className="flex items-center gap-1">
-                        <span>Try:</span>
-                        <span className="text-yellow-400">↑↑↓↓←→←→BA</span>
+                        <span className="text-gray-500">↑↑↓↓←→←→BA</span>
                     </div>
                 </div>
             )}

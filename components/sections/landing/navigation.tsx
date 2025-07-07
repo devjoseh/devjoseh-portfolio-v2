@@ -13,7 +13,7 @@ export function Navigation() {
 
     const sections = [
         { id: "about", label: "Sobre" },
-        { id: "skills-tools", label: "Tecnologias" },
+        { id: "skills", label: "Tecnologias" },
         { id: "experience", label: "Experiência" },
         { id: "projects", label: "Projetos" },
         { id: "hackathons", label: "Hackathons" },

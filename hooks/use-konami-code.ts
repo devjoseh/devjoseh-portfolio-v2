@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 
 const KONAMI_CODE = [
     "ArrowUp",
@@ -15,62 +15,45 @@ const KONAMI_CODE = [
     "KeyA",
 ];
 
-export function useKonamiCode(callback: () => void) {
-    const [_sequence, setSequence] = useState<string[]>([]);
-    const [isActivated, setIsActivated] = useState(false);
-
-    const resetSequence = useCallback(() => {
-        setSequence([]);
-    }, []);
-
-    const handleKeyDown = useCallback(
-        (event: KeyboardEvent) => {
-            // Ignore if user is typing in an input field
-            if (
-                event.target instanceof HTMLInputElement ||
-                event.target instanceof HTMLTextAreaElement
-            ) {
-                return;
-            }
-
-            const key = event.code;
-            setSequence((prevSequence) => {
-                const newSequence = [...prevSequence, key];
-
-                // Check if the current sequence matches the beginning of Konami code
-                const isValidSequence = KONAMI_CODE.slice(
-                    0,
-                    newSequence.length
-                ).every((konamiKey, index) => konamiKey === newSequence[index]);
-
-                if (!isValidSequence) {
-                    // Reset if sequence doesn't match
-                    return key === KONAMI_CODE[0] ? [key] : [];
-                }
-
-                // Check if complete sequence is entered
-                if (newSequence.length === KONAMI_CODE.length) {
-                    if (!isActivated) {
-                        setIsActivated(true);
-                        callback();
-                        // Reset after a delay to allow re-activation
-                        setTimeout(() => setIsActivated(false), 5000);
-                    }
-                    return [];
-                }
-
-                return newSequence;
-            });
-        },
-        [callback, isActivated]
-    );
+export function useKonamiCode() {
+    const [_keys, setKeys] = useState<string[]>([]);
+    const [activated, setActivated] = useState(false);
 
     useEffect(() => {
-        document.addEventListener("keydown", handleKeyDown);
-        return () => {
-            document.removeEventListener("keydown", handleKeyDown);
-        };
-    }, [handleKeyDown]);
+        const handleKeyDown = (event: KeyboardEvent) => {
+            setKeys((prevKeys) => {
+                const newKeys = [...prevKeys, event.code];
 
-    return { isActivated, resetSequence };
+                // Keep only the last 10 keys
+                if (newKeys.length > KONAMI_CODE.length) {
+                    newKeys.shift();
+                }
+
+                // Check if the sequence matches
+                if (newKeys.length === KONAMI_CODE.length) {
+                    const matches = newKeys.every(
+                        (key, index) => key === KONAMI_CODE[index]
+                    );
+                    if (matches && !activated) {
+                        setActivated(true);
+                        // Reset after activation
+                        setTimeout(() => {
+                            setActivated(false);
+                            setKeys([]);
+                        }, 1000);
+                    }
+                }
+
+                return newKeys;
+            });
+        };
+
+        window.addEventListener("keydown", handleKeyDown);
+
+        return () => {
+            window.removeEventListener("keydown", handleKeyDown);
+        };
+    }, [activated]);
+
+    return activated;
 }

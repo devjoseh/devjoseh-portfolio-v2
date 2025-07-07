@@ -86,6 +86,76 @@
   background: #9ca3af;
 }
 
+/* Scrollbar for terminal */
+.scrollbar-thin {
+  scrollbar-width: thin;
+}
+
+.scrollbar-thumb-gray-600 {
+  scrollbar-color: #4b5563 transparent;
+}
+
+.scrollbar-track-gray-800 {
+  scrollbar-color: #1f2937 transparent;
+}
+
+/* Mobile-specific terminal fixes to prevent layout disruption */
+.mobile-terminal-wrapper {
+  /* Ensure terminal doesn't push content around on mobile */
+  position: relative;
+  z-index: 1;
+}
+
+.mobile-terminal-container {
+  /* Prevent terminal from affecting text positioning */
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.mobile-terminal-content {
+  /* Optimize terminal height for mobile screens without affecting hero text */
+  height: 320px;
+}
+
+@media (max-width: 768px) {
+  .mobile-terminal-content {
+    height: 280px; /* Slightly smaller on mobile to prevent layout issues */
+  }
+
+  /* Ensure hero section maintains proper spacing */
+  .hero-section-mobile {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+  }
+
+  /* Fix any potential text positioning issues caused by terminal */
+  .hero-text-container {
+    position: relative;
+    z-index: 2;
+    margin-bottom: 2rem;
+  }
+
+  /* Prevent terminal from pushing text up */
+  .mobile-terminal-wrapper {
+    margin-top: 1rem;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .mobile-terminal-content {
+    height: 260px; /* Even smaller on very small screens */
+  }
+
+  /* Ensure proper text layout on small screens */
+  .hero-content-mobile {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    align-items: center;
+  }
+}
+
 /* Matrix Effect Styles */
 .matrix-mode {
   overflow: hidden;
@@ -180,11 +250,18 @@
   }
 }
 
-/* Responsive Terminal */
+/* Responsive adjustments for matrix effect */
 @media (max-width: 768px) {
   .matrix-column {
     width: 15px;
     font-size: 12px;
+  }
+}
+
+@media (max-width: 640px) {
+  .matrix-column {
+    width: 12px;
+    font-size: 10px;
   }
 }
 

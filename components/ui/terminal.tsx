@@ -34,7 +34,7 @@ export function Terminal({ className = "" }: TerminalProps) {
     const inputRef = useRef<HTMLInputElement>(null);
     const terminalRef = useRef<HTMLDivElement>(null);
 
-    const commands = {
+const commands = {
         help: () => [
             "Comandos disponíveis:",
             "  whoami     - Informações sobre o desenvolvedor",
@@ -206,7 +206,7 @@ export function Terminal({ className = "" }: TerminalProps) {
 
     return (
         <div
-            className={`bg-gray-900/95 backdrop-blur-sm border border-gray-700 rounded-lg shadow-2xl ${className}`}
+            className={`bg-gray-900/95 backdrop-blur-sm border border-gray-700 rounded-lg shadow-2xl mobile-terminal-container ${className}`}
         >
             {/* Terminal Header */}
             <div className="flex items-center justify-between bg-gray-800 px-4 py-2 rounded-t-lg border-b border-gray-700">
@@ -220,24 +220,35 @@ export function Terminal({ className = "" }: TerminalProps) {
                     <button
                         onClick={() => setIsMinimized(!isMinimized)}
                         className="w-3 h-3 bg-yellow-500 rounded-full hover:bg-yellow-400 transition-colors"
+                        aria-label={
+                            isMinimized
+                                ? "Maximize terminal"
+                                : "Minimize terminal"
+                        }
                     >
                         <Minimize2 className="w-2 h-2 text-gray-900 mx-auto" />
                     </button>
-                    <button className="w-3 h-3 bg-green-500 rounded-full hover:bg-green-400 transition-colors">
+                    <button
+                        className="w-3 h-3 bg-green-500 rounded-full hover:bg-green-400 transition-colors"
+                        aria-label="Maximize terminal"
+                    >
                         <Square className="w-2 h-2 text-gray-900 mx-auto" />
                     </button>
-                    <button className="w-3 h-3 bg-red-500 rounded-full hover:bg-red-400 transition-colors">
+                    <button
+                        className="w-3 h-3 bg-red-500 rounded-full hover:bg-red-400 transition-colors"
+                        aria-label="Close terminal"
+                    >
                         <X className="w-2 h-2 text-gray-900 mx-auto" />
                     </button>
                 </div>
             </div>
 
-            {/* Terminal Content */}
+            {/* Terminal Content - Mobile height optimization */}
             {!isMinimized && (
-                <div className="p-4 h-80 flex flex-col">
+                <div className="p-4 mobile-terminal-content flex flex-col">
                     <div
                         ref={terminalRef}
-                        className="flex-1 overflow-y-auto font-mono text-sm space-y-1 mb-4"
+                        className="flex-1 overflow-y-auto font-mono text-sm space-y-1 mb-4 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800"
                     >
                         {/* Initial typing animation */}
                         {isTyping && history.length <= 2 && (
@@ -245,11 +256,11 @@ export function Terminal({ className = "" }: TerminalProps) {
                                 <TypeAnimation
                                     sequence={[
                                         "Inicializando sistema...",
-                                        500,
+                                        1000,
                                         "Carregando perfil do desenvolvedor...",
-                                        500,
+                                        1000,
                                         "Sistema pronto! 🚀",
-                                        500,
+                                        1000,
                                         () => setIsTyping(false),
                                     ]}
                                     wrapper="span"
@@ -267,7 +278,7 @@ export function Terminal({ className = "" }: TerminalProps) {
                             history.map((line, index) => (
                                 <div
                                     key={index}
-                                    className={`${
+                                    className={`break-words ${
                                         line.type === "input"
                                             ? "text-white"
                                             : line.type === "system"

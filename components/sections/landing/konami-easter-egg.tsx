@@ -1,93 +1,92 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useKonamiCode } from "@/hooks/use-konami-code";
-import { useState } from "react";
 
 export function KonamiEasterEgg() {
-    const [isActive, setIsActive] = useState(false);
-    const [showNotification, setShowNotification] = useState(false);
+    const [isMatrixMode, setIsMatrixMode] = useState(false);
+    const [showHint, setShowHint] = useState(false);
+    const konamiActivated = useKonamiCode();
 
-    const handleKonamiActivation = () => {
-        setIsActive(true);
-        setShowNotification(true);
+    useEffect(() => {
+        if (konamiActivated) {
+            setIsMatrixMode(true);
+            document.body.classList.add("matrix-mode");
 
-        // Add matrix effect to body
-        document.body.classList.add("matrix-mode");
+            // Create matrix rain effect
+            createMatrixRain();
 
-        // Show notification for 3 seconds
-        setTimeout(() => {
-            setShowNotification(false);
-        }, 3000);
+            // Show success message
+            const successMessage = document.createElement("div");
+            successMessage.innerHTML =
+                "🕶️ Matrix Mode Activated! Welcome to the real world, Neo...";
+            successMessage.className =
+                "fixed top-4 left-1/2 transform -translate-x-1/2 bg-black text-green-400 px-6 py-3 rounded-lg font-mono text-sm z-50 border border-green-400";
+            document.body.appendChild(successMessage);
 
-        // Remove matrix effect after 10 seconds
-        setTimeout(() => {
-            setIsActive(false);
-            document.body.classList.remove("matrix-mode");
+            setTimeout(() => {
+                document.body.removeChild(successMessage);
+            }, 5000);
+        }
+    }, [konamiActivated]);
+
+    useEffect(() => {
+        // Show hint after 10 seconds
+        const timer = setTimeout(() => {
+            setShowHint(true);
         }, 15000);
-    };
 
-    useKonamiCode(handleKonamiActivation);
+        return () => clearTimeout(timer);
+    }, []);
+
+    const createMatrixRain = () => {
+        const matrixContainer = document.createElement("div");
+        matrixContainer.className = "matrix-rain";
+        document.body.appendChild(matrixContainer);
+
+        const characters =
+            "アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+        for (let i = 0; i < 50; i++) {
+            const column = document.createElement("div");
+            column.className = "matrix-column";
+            column.style.left = Math.random() * 100 + "%";
+            column.style.animationDuration = Math.random() * 3 + 2 + "s";
+            column.style.animationDelay = Math.random() * 2 + "s";
+
+            for (let j = 0; j < 20; j++) {
+                const char = document.createElement("span");
+                char.className = "matrix-char";
+                char.textContent =
+                    characters[Math.floor(Math.random() * characters.length)];
+                char.style.animationDelay = j * 0.1 + "s";
+                column.appendChild(char);
+            }
+
+            matrixContainer.appendChild(column);
+        }
+
+        // Remove matrix effect after 30 seconds
+        setTimeout(() => {
+            document.body.classList.remove("matrix-mode");
+            if (document.body.contains(matrixContainer)) {
+                document.body.removeChild(matrixContainer);
+            }
+            setIsMatrixMode(false);
+        }, 30000);
+    };
 
     return (
         <>
-            {/* Matrix Rain Effect */}
-            {isActive && (
-                <div className="fixed inset-0 pointer-events-none z-[9999] overflow-hidden">
-                    <div className="matrix-rain">
-                        {Array.from({ length: 50 }).map((_, i) => (
-                            <div
-                                key={i}
-                                className="matrix-column"
-                                style={{
-                                    left: `${Math.random() * 100}%`,
-                                    animationDelay: `${Math.random() * 2}s`,
-                                    animationDuration: `${
-                                        2 + Math.random() * 3
-                                    }s`,
-                                }}
-                            >
-                                {Array.from({ length: 20 }).map((_, j) => (
-                                    <span
-                                        key={j}
-                                        className="matrix-char"
-                                        style={{
-                                            animationDelay: `${j * 0.1}s`,
-                                        }}
-                                    >
-                                        {String.fromCharCode(
-                                            0x30a0 + Math.random() * 96
-                                        )}
-                                    </span>
-                                ))}
-                            </div>
-                        ))}
+            {/* Konami Code Hint - Hidden on mobile */}
+            {showHint && !isMatrixMode && (
+                <div className="fixed bottom-4 left-4 bg-black/80 text-green-400 px-3 py-2 rounded-lg font-mono text-xs border border-green-400/30 easter-hint z-40 hidden md:block">
+                    <div className="flex items-center gap-1">
+                        <span>Try:</span>
+                        <span className="text-yellow-400">↑↑↓↓←→←→BA</span>
                     </div>
                 </div>
             )}
-
-            {/* Notification */}
-            {showNotification && (
-                <div className="fixed top-4 right-4 z-[10000] bg-green-500/90 backdrop-blur-sm text-black px-6 py-3 rounded-lg shadow-lg animate-in slide-in-from-right-5 duration-500">
-                    <div className="flex items-center gap-2">
-                        <span className="text-lg">🕶️</span>
-                        <div>
-                            <div className="font-bold">
-                                Código Konami Ativado!
-                            </div>
-                            <div className="text-sm opacity-90">
-                                Bem-vindo à Matrix...
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Floating Easter Egg Hint */}
-            <div className="fixed bottom-4 left-4 z-50 opacity-20 hover:opacity-100 transition-opacity duration-300">
-                <div className="bg-gray-900/80 backdrop-blur-sm text-white px-3 py-2 rounded-lg text-xs font-mono">
-                    <div>↑↑↓↓←→←→BA</div>
-                </div>
-            </div>
         </>
     );
 }

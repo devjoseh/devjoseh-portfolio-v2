@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowDown, Github, Linkedin, Mail } from "lucide-react";
+import { Terminal } from "@/components/ui/terminal";
 import Link from "next/link";
 
 export function HeroSection() {
@@ -39,82 +40,95 @@ export function HeroSection() {
 
             {/* Content with proper margins */}
             <div className="container mx-auto px-4 md:px-8 lg:px-12 xl:px-16 z-10">
-                <div
-                    className={`text-center transition-all duration-1000 ${
-                        isVisible
-                            ? "opacity-100 translate-y-0"
-                            : "opacity-0 translate-y-10"
-                    }`}
-                >
-                    <div className="mb-8">
-                        <div className="text-center space-y-2">
-                            {/* Large prominent DevJoseH */}
-                            <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-white via-purple-200 to-purple-400 bg-clip-text text-transparent">
-                                DevJoseH
-                            </h1>
+                <div className="grid lg:grid-cols-2 gap-8 items-center">
+                    {/* Left side - Main content */}
+                    <div
+                        className={`text-center lg:text-left transition-all duration-1000 ${
+                            isVisible
+                                ? "opacity-100 translate-y-0"
+                                : "opacity-0 translate-y-10"
+                        }`}
+                    >
+                        <div className="mb-8">
+                            <div className="space-y-2">
+                                {/* Large prominent DevJoseH */}
+                                <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold bg-gradient-to-r from-white via-purple-200 to-purple-400 bg-clip-text text-transparent">
+                                    DevJoseH
+                                </h1>
 
-                            {/* Medium-sized José Hernanes */}
-                            <h2 className="text-2xl md:text-4xl font-semibold text-gray-200">
-                                José Hernanes
-                            </h2>
+                                {/* Medium-sized José Hernanes */}
+                                <h2 className="text-xl md:text-3xl lg:text-4xl font-semibold text-gray-200">
+                                    José Hernanes
+                                </h2>
 
-                            {/* Smaller Desenvolvedor Back-end */}
-                            <p className="text-lg md:text-xl text-purple-400 font-medium">
-                                Desenvolvedor Back-end
-                            </p>
+                                {/* Smaller Desenvolvedor Back-end */}
+                                <p className="text-base md:text-lg lg:text-xl text-purple-400 font-medium">
+                                    Desenvolvedor Back-end
+                                </p>
+                            </div>
                         </div>
-                    </div>
 
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-                        <Button
+                        <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start items-center mb-12">
+                            <Button
                             onClick={scrollToProjects}
                             size="lg"
                             className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-8 py-3 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg"
                         >
                             Ver Meus Projetos
                         </Button>
-                        <div className="flex gap-4">
-                            <Link
-                                href="https://github.com/DevJoseH"
-                                target="_blank"
-                            >
-                                <Button
-                                    variant="outline"
-                                    size="icon"
-                                    className="rounded-full border-purple-500/30 hover:border-purple-500 hover:bg-purple-500/10 bg-transparent transition-all duration-300 hover:scale-110"
+                            <div className="flex gap-4">
+                                <Link
+                                    href="https://github.com/DevJoseH"
+                                    target="_blank"
                                 >
-                                    <Github className="w-5 h-5" />
-                                </Button>
-                            </Link>
-                            <Link
-                                href="https://www.linkedin.com/in/devjoseh/"
-                                target="_blank"
-                            >
-                                <Button
-                                    variant="outline"
-                                    size="icon"
-                                    className="rounded-full border-purple-500/30 hover:border-purple-500 hover:bg-purple-500/10 bg-transparent transition-all duration-300 hover:scale-110"
+                                    <Button
+                                        variant="outline"
+                                        size="icon"
+                                        className="rounded-full border-purple-500/30 hover:border-purple-500 hover:bg-purple-500/10 bg-transparent transition-all duration-300 hover:scale-110"
+                                    >
+                                        <Github className="w-5 h-5" />
+                                    </Button>
+                                </Link>
+                                <Link
+                                    href="https://www.linkedin.com/in/devjoseh/"
+                                    target="_blank"
                                 >
-                                    <Linkedin className="w-5 h-5" />
-                                </Button>
-                            </Link>
-                            <Link
-                                href="mailto:contato@devjoseh.com.br"
-                                target="_blank"
-                            >
-                                <Button
-                                    variant="outline"
-                                    size="icon"
-                                    className="rounded-full border-purple-500/30 hover:border-purple-500 hover:bg-purple-500/10 bg-transparent transition-all duration-300 hover:scale-110"
+                                    <Button
+                                        variant="outline"
+                                        size="icon"
+                                        className="rounded-full border-purple-500/30 hover:border-purple-500 hover:bg-purple-500/10 bg-transparent transition-all duration-300 hover:scale-110"
+                                    >
+                                        <Linkedin className="w-5 h-5" />
+                                    </Button>
+                                </Link>
+                                <Link
+                                    href="mailto:contato@devjoseh.com.br"
+                                    target="_blank"
                                 >
-                                    <Mail className="w-5 h-5" />
-                                </Button>
-                            </Link>
+                                    <Button
+                                        variant="outline"
+                                        size="icon"
+                                        className="rounded-full border-purple-500/30 hover:border-purple-500 hover:bg-purple-500/10 bg-transparent transition-all duration-300 hover:scale-110"
+                                    >
+                                        <Mail className="w-5 h-5" />
+                                    </Button>
+                                </Link>
+                            </div>
+                        </div>
+                        <div className="animate-bounce lg:text-left">
+                            <ArrowDown className="w-6 h-6 text-purple-400 mx-auto lg:mx-0" />
                         </div>
                     </div>
 
-                    <div className="animate-bounce">
-                        <ArrowDown className="w-6 h-6 text-purple-400 mx-auto" />
+                    {/* Right side - Interactive Terminal */}
+                    <div
+                        className={`transition-all duration-1000 delay-300 ${
+                            isVisible
+                                ? "opacity-100 translate-x-0"
+                                : "opacity-0 translate-x-10"
+                        }`}
+                    >
+                        <Terminal className="w-full max-w-lg mx-auto lg:mx-0" />
                     </div>
                 </div>
             </div>

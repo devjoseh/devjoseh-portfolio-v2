@@ -1,8 +1,7 @@
 "use client";
 
-import { useState, useEffect, createContext, useContext } from "react";
+import { createContext, useContext, useState, useEffect, type ReactNode } from "react";
 import { CommandPalette } from "./command-palette";
-import type React from "react";
 
 interface CommandPaletteContextType {
     isOpen: boolean;
@@ -17,26 +16,27 @@ const CommandPaletteContext = createContext<
 
 export function useCommandPalette() {
     const context = useContext(CommandPaletteContext);
-    if (!context) {
+    if (context === undefined) {
         throw new Error(
-            "useCommandPalette must be used within CommandPaletteProvider"
+            "useCommandPalette must be used within a CommandPaletteProvider"
         );
     }
     return context;
 }
 
+interface CommandPaletteProviderProps {
+    children: ReactNode;
+}
+
 export function CommandPaletteProvider({
     children,
-}: {
-    children: React.ReactNode;
-}) {
+}: CommandPaletteProviderProps) {
     const [isOpen, setIsOpen] = useState(false);
 
     const open = () => setIsOpen(true);
     const close = () => setIsOpen(false);
     const toggle = () => setIsOpen((prev) => !prev);
 
-    // Handle global keyboard shortcut
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
             if ((e.metaKey || e.ctrlKey) && e.key === "k") {
@@ -47,7 +47,7 @@ export function CommandPaletteProvider({
 
         document.addEventListener("keydown", handleKeyDown);
         return () => document.removeEventListener("keydown", handleKeyDown);
-    }, []); // Removed toggle from dependency array
+    }, []); // Removed toggle from the dependency array
 
     return (
         <CommandPaletteContext.Provider value={{ isOpen, open, close, toggle }}>

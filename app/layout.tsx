@@ -1,4 +1,5 @@
 import { CommandPaletteProvider } from "@/components/ui/command-palette-provider"
+import { KonamiEasterEgg } from "@/components/sections/landing/konami-easter-egg"
 import { Inter } from "next/font/google";
 import type { Metadata } from "next";
 import type React from "react";
@@ -103,7 +104,10 @@ export default function RootLayout({
                 />
             </head>
             <body className={inter.className}>
-                <CommandPaletteProvider>{children}</CommandPaletteProvider>
+                <CommandPaletteProvider>
+                    {children}
+                    <KonamiEasterEgg />
+                </CommandPaletteProvider>
             </body>
         </html>
     );

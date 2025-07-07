@@ -69,25 +69,22 @@
 
 /* Mobile-specific terminal fixes to prevent layout disruption */
 .mobile-terminal-wrapper {
-  /* Ensure terminal doesn't push content around on mobile */
   position: relative;
   z-index: 1;
 }
 
 .mobile-terminal-container {
-  /* Prevent terminal from affecting text positioning */
   max-width: 100%;
   overflow: hidden;
 }
 
 .mobile-terminal-content {
-  /* Optimize terminal height for mobile screens without affecting hero text */
   height: 320px;
 }
 
 @media (max-width: 768px) {
   .mobile-terminal-content {
-    height: 280px; /* Slightly smaller on mobile to prevent layout issues */
+    height: 280px;
   }
 
   /* Ensure hero section maintains proper spacing */
@@ -112,7 +109,7 @@
 
 @media (max-width: 640px) {
   .mobile-terminal-content {
-    height: 260px; /* Even smaller on very small screens */
+    height: 260px;
   }
 
   /* Ensure proper text layout on small screens */
@@ -130,7 +127,7 @@
 }
 
 .matrix-rain {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
@@ -299,10 +296,6 @@ input:focus-visible {
 .matrix-mode body {
   background: #000;
   color: #00ff00;
-}
-
-.matrix-mode .bg-gray-900 {
-  background: #001100 !important;
 }
 
 .matrix-mode .text-white {

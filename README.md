@@ -60,7 +60,7 @@ Para executar este projeto localmente, você precisará ter o [Node.js](https://
    - Copie e cole o conteúdo dos arquivos localizados em `utils/supabase/schema/` na ordem correta para criar as tabelas, policies, funções, triggers e popular o banco com dados iniciais (seeders).
 
 4. **Configure as variáveis de ambiente:**
-   Renomeie o arquivo ``.env.example` para `.env.local` e adicione as seguintes variáveis de ambiente, substituindo os valores pelos da sua instância do Supabase e Turnstile da CloudFlare:
+   Renomeie o arquivo `.env.example` para `.env.local` e adicione as seguintes variáveis de ambiente, substituindo os valores pelos da sua instância do Supabase e Turnstile da CloudFlare:
    ```env
    SUPABASE_URL=
    SUPABASE_ANON_KEY=

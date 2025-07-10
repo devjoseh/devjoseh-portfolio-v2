@@ -1,13 +1,13 @@
 "use client";
 
-import { CommandPaletteTrigger } from "../../ui/command-palette-trigger";
+import { CommandPaletteTrigger } from "@/components/index";
 import { Menu, X, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { Logo } from "@/components/ui/logo";
 import { appConfig } from "@/config";
 
-export function Navigation() {
+export function NavigationContent() {
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [activeSection, setActiveSection] = useState("");

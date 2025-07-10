@@ -22,6 +22,23 @@ Este é o repositório para a segunda versão do meu portfólio, desenvolvido pa
 | :---: | :---: |
 | ![Página Principal](./public/home_page.png) | ![Área Administrativa](./public/admin_page.png) |
 
+## 🚧 Funcionalidades Planejadas
+
+Abaixo estão listadas as funcionalidades e sistemas que fazem ou farão parte deste projeto. Essa lista será atualizada conforme o desenvolvimento avança.
+
+- [x] Cards Interativos
+- [x] Página de Links inspirado no linktree
+- [x] Dashboard Admin
+- [x] Barra de Pesquisa
+- [x] Terminal Funcional
+- [x] Konami Easter Egg
+- [ ] Blog Pessoal
+- [ ] Guestbook (Mural de Recados)
+- [ ] Detalhamento de Projetos
+- [ ] Sistema de Reações (Likes/Emojis)
+
+Entre em contato comigo e sinta-se à vontade para sugerir melhorias ou novas ideias!
+
 ## 🚀 Começando
 
 Para executar este projeto localmente, você precisará ter o [Node.js](https://nodejs.org/) (versão 20 ou superior) e o [npm](https://www.npmjs.com/) instalados em sua máquina.

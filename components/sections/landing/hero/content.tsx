@@ -2,11 +2,27 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowDown, Github, Linkedin, Mail } from "lucide-react";
+import { ArrowDown, Github, Linkedin, Mail, Download, ChevronDown } from "lucide-react";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Terminal } from "@/components/index";
+import type { Resumes } from "@/utils/supabase/types";
 import Link from "next/link";
 
-export function HeroContent() {
+const LANGUAGE_FLAGS: Record<string, string> = {
+    "pt-BR": "🇧🇷",
+    "en": "🇺🇸",
+};
+
+interface HeroContentProps {
+    resumes: Resumes[];
+}
+
+export function HeroContent({ resumes }: HeroContentProps) {
     const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
@@ -16,6 +32,8 @@ export function HeroContent() {
     const scrollToProjects = () => {
         document.getElementById("projects")?.scrollIntoView({ behavior: "smooth" });
     };
+
+    const activeResumes = resumes.filter((r) => r.is_active);
 
     return (
         <div className="flex flex-col lg:grid lg:grid-cols-2 gap-8 lg:gap-12 items-center justify-center min-h-[calc(100vh-8rem)]">
@@ -47,10 +65,7 @@ export function HeroContent() {
                         Ver Meus Projetos
                     </Button>
                     <div className="flex gap-4">
-                        <Link
-                            href="https://github.com/DevJoseH"
-                            target="_blank"
-                        >
+                        <Link href="https://github.com/DevJoseH" target="_blank">
                             <Button
                                 variant="outline"
                                 size="icon"
@@ -59,10 +74,7 @@ export function HeroContent() {
                                 <Github className="w-5 h-5" />
                             </Button>
                         </Link>
-                        <Link
-                            href="https://www.linkedin.com/in/devjoseh/"
-                            target="_blank"
-                        >
+                        <Link href="https://www.linkedin.com/in/devjoseh/" target="_blank">
                             <Button
                                 variant="outline"
                                 size="icon"
@@ -71,10 +83,7 @@ export function HeroContent() {
                                 <Linkedin className="w-5 h-5" />
                             </Button>
                         </Link>
-                        <Link
-                            href="mailto:contato@devjoseh.com.br"
-                            target="_blank"
-                        >
+                        <Link href="mailto:contato@devjoseh.com.br" target="_blank">
                             <Button
                                 variant="outline"
                                 size="icon"

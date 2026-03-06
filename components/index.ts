@@ -20,6 +20,7 @@ export * from "./sections/admin/experience";
 export * from "./sections/admin/hackathon";
 export * from "./sections/admin/links";
 export * from "./sections/admin/project";
+export * from "./sections/admin/resume";
 
 // UI
 export * from "./ui/badge";

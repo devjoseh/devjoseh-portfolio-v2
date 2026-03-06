@@ -3,6 +3,7 @@ import { AdminDashboard } from "@/components/index";
 import { getProjects, getExperiences } from "@/utils/actions/data";
 import { getHackathons } from "@/utils/actions/admin";
 import { getAllResumes } from "@/utils/actions/resume";
+import { getAboutSettings } from "@/utils/actions/about";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -19,6 +20,7 @@ export default async function AdminPage() {
         analytics,
         hackathons,
         resumes,
+        aboutSettings,
     ] = await Promise.all([
         getProjects(),
         getExperiences(),
@@ -27,6 +29,7 @@ export default async function AdminPage() {
         getLinkAnalytics(30),
         getHackathons(),
         getAllResumes(),
+        getAboutSettings(),
     ]);
 
     return (
@@ -38,6 +41,7 @@ export default async function AdminPage() {
             analytics={analytics}
             initialHackathons={hackathons}
             initialResumes={resumes}
+            initialAboutSettings={aboutSettings}
         />
     );
 }

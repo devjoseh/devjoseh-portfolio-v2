@@ -1,10 +1,10 @@
 "use client";
 
-import { LayoutDashboard, Briefcase, FolderOpen, Trophy, LinkIcon, BarChart3, ArrowLeft, Settings, LogOut, FileText } from "lucide-react";
-import { ExperienceManager, HackathonManager, LinksManager, AnalyticsDashboard, ProjectManager, ResumeManager } from "../../index"
+import { LayoutDashboard, Briefcase, FolderOpen, Trophy, LinkIcon, BarChart3, ArrowLeft, Settings, LogOut, FileText, User } from "lucide-react";
+import { ExperienceManager, HackathonManager, LinksManager, AnalyticsDashboard, ProjectManager, ResumeManager, AboutManager } from "../../index"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import type { Links as dbLink, ProfileSettings } from "@/utils/supabase/types";
+import type { Links as dbLink, ProfileSettings, AboutSettings } from "@/utils/supabase/types";
 import type { Hackathons as Hackathon } from "@/utils/supabase/types";
 import type { Resumes } from "@/utils/supabase/types";
 import { signOut } from "@/utils/actions/sign-out";
@@ -20,6 +20,7 @@ interface AdminDashboardProps {
     analytics: any[];
     initialHackathons: Hackathon[];
     initialResumes: Resumes[];
+    initialAboutSettings: AboutSettings | null;
 }
 
 export function AdminDashboard({
@@ -30,6 +31,7 @@ export function AdminDashboard({
     analytics,
     initialHackathons,
     initialResumes,
+    initialAboutSettings,
 }: AdminDashboardProps) {
     const [activeTab, setActiveTab] = useState("overview");
 
@@ -55,12 +57,13 @@ export function AdminDashboard({
 
     const tabConfig = [
         { id: "overview",    label: "Visão Geral",   icon: LayoutDashboard, color: "text-blue-400"   },
-        { id: "experiences", label: "Experiências",   icon: Briefcase,        color: "text-green-400" },
-        { id: "projects",    label: "Projetos",        icon: FolderOpen,       color: "text-purple-400"},
-        { id: "hackathons",  label: "Hackathons",      icon: Trophy,           color: "text-yellow-400"},
-        { id: "links",       label: "Links",           icon: LinkIcon,         color: "text-pink-400"  },
-        { id: "resumes",     label: "Currículos",      icon: FileText,         color: "text-cyan-400"  },
-        { id: "analytics",   label: "Analytics",       icon: BarChart3,        color: "text-orange-400"},
+        { id: "about",       label: "Quem Sou Eu",   icon: User,            color: "text-indigo-400" },
+        { id: "experiences", label: "Experiências",   icon: Briefcase,       color: "text-green-400"  },
+        { id: "projects",    label: "Projetos",       icon: FolderOpen,      color: "text-purple-400" },
+        { id: "hackathons",  label: "Hackathons",     icon: Trophy,          color: "text-yellow-400" },
+        { id: "links",       label: "Links",          icon: LinkIcon,        color: "text-pink-400"   },
+        { id: "resumes",     label: "Currículos",     icon: FileText,        color: "text-cyan-400"   },
+        { id: "analytics",   label: "Analytics",      icon: BarChart3,       color: "text-orange-400" },
     ];
 
     return (
@@ -111,41 +114,44 @@ export function AdminDashboard({
                 </div>
 
                 {/* Main Content */}
-                <div className="container mx-auto px-4 py-6">
+                <div className="container mx-auto px-4 py-6 max-w-7xl">
                     <Tabs
                         value={activeTab}
                         onValueChange={setActiveTab}
-                        className="space-y-6"
+                        orientation="vertical"
+                        className="flex flex-col lg:flex-row gap-6 md:gap-8 min-h-[calc(100vh-16rem)]"
                     >
-                        <div className="w-full">
-                            <TabsList className="w-full h-auto p-1 bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 rounded-xl shadow-lg">
-                        <div className="grid grid-cols-3 md:grid-cols-7 gap-1 w-full">
-                                    {tabConfig.map((tab) => (
-                                        <TabsTrigger
-                                            key={tab.id}
-                                            value={tab.id}
-                                            className={`relative flex items-center justify-center gap-2 px-3 py-3 md:py-4 rounded-lg transition-all duration-300 font-medium text-xs md:text-sm min-h-[48px] md:min-h-[56px] data-[state=active]:bg-purple-600 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=inactive]:text-gray-400 data-[state=inactive]:hover:text-gray-200 data-[state=inactive]:hover:bg-gray-700/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 transform data-[state=active]:scale-[1.02]`}
-                                        >
-                                            <tab.icon
-                                                className={`w-4 h-4 flex-shrink-0 transition-colors duration-300 ${
-                                                    activeTab === tab.id
-                                                        ? "text-white"
-                                                        : tab.color
-                                                }`}
-                                            />
-                                            <span className="hidden sm:inline truncate">
-                                                {tab.label}
-                                            </span>
+                        {/* Sidebar via flex shrink on Desktop, horizontal scroll on Mobile */}
+                        <div className="w-full lg:w-64 flex-shrink-0">
+                            <TabsList className="flex flex-row lg:flex-col h-auto p-2 bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 rounded-xl shadow-lg w-full overflow-x-auto justify-start hide-scrollbar gap-1 lg:gap-2">
+                                {tabConfig.map((tab) => (
+                                    <TabsTrigger
+                                        key={tab.id}
+                                        value={tab.id}
+                                        className={`relative flex items-center justify-center lg:justify-start gap-3 px-4 py-3 rounded-lg transition-all duration-300 font-medium text-sm w-max lg:w-full min-w-max lg:min-w-0 data-[state=active]:bg-purple-600 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=inactive]:text-gray-400 data-[state=inactive]:hover:text-gray-200 data-[state=inactive]:hover:bg-gray-700/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500`}
+                                    >
+                                        <tab.icon
+                                            className={`w-5 h-5 flex-shrink-0 transition-colors duration-300 ${
+                                                activeTab === tab.id
+                                                    ? "text-white"
+                                                    : tab.color
+                                            }`}
+                                        />
+                                        <span className={`transition-all duration-300 ${activeTab === tab.id ? "font-semibold text-white" : ""}`}>
+                                            {tab.label}
+                                        </span>
 
-                                            {/* Active indicator */}
-                                            {activeTab === tab.id && (
-                                                <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-purple-600/20 to-purple-500/20 pointer-events-none" />
-                                            )}
-                                        </TabsTrigger>
-                                    ))}
-                                </div>
+                                        {/* Active indicator overlay */}
+                                        {activeTab === tab.id && (
+                                            <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-purple-600/20 to-purple-500/20 pointer-events-none" />
+                                        )}
+                                    </TabsTrigger>
+                                ))}
                             </TabsList>
                         </div>
+                        
+                        {/* The Rest of the Content */}
+                        <div className="flex-1 w-full min-w-0 overflow-hidden">
 
                         {/* Overview Tab */}
                         <TabsContent
@@ -343,8 +349,15 @@ export function AdminDashboard({
 
                         {/* Content Tabs */}
                         <TabsContent
+                            value="about"
+                            className="animate-fadeInUp mt-0"
+                        >
+                            <AboutManager initialSettings={initialAboutSettings} />
+                        </TabsContent>
+
+                        <TabsContent
                             value="experiences"
-                            className="animate-fadeInUp"
+                            className="animate-fadeInUp mt-0"
                         >
                             <ExperienceManager
                                 initialExperiences={initialExperiences}
@@ -380,13 +393,14 @@ export function AdminDashboard({
 
                         <TabsContent
                             value="analytics"
-                            className="animate-fadeInUp"
+                            className="animate-fadeInUp mt-0"
                         >
                             <AnalyticsDashboard
                                 links={initialLinks}
                                 analytics={analytics}
                             />
                         </TabsContent>
+                    </div>
                     </Tabs>
                 </div>
             </div>

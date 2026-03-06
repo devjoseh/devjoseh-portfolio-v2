@@ -21,6 +21,7 @@ export * from "./sections/admin/hackathon";
 export * from "./sections/admin/links";
 export * from "./sections/admin/project";
 export * from "./sections/admin/resume";
+export * from "./sections/admin/about";
 
 // UI
 export * from "./ui/badge";

@@ -19,10 +19,20 @@ export type Projects = {
 export type Skills = {
     id: string;
     name: string;
-    category: string;
-    proficiency: number;
+    category?: string; // (Depreciado em favor do category_id)
+    category_id: string | null;
+    proficiency?: number;
     icon_name: string | null;
+    order_index: number;
     created_at: string;
+}
+
+export type SkillCategories = {
+    id: string;
+    name: string;
+    order_index: number;
+    created_at: string;
+    updated_at: string;
 }
 
 export type Experiences = {

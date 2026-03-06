@@ -2,9 +2,11 @@
 
 import { LayoutDashboard, Briefcase, FolderOpen, Trophy, LinkIcon, BarChart3, ArrowLeft, Settings, LogOut, FileText, User } from "lucide-react";
 import { ExperienceManager, HackathonManager, LinksManager, AnalyticsDashboard, ProjectManager, ResumeManager, AboutManager } from "../../index"
+import { SkillsManager } from "./skills";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import type { Links as dbLink, ProfileSettings, AboutSettings } from "@/utils/supabase/types";
+import type { Links as dbLink, ProfileSettings, AboutSettings, SkillCategories, Skills } from "@/utils/supabase/types";
+import type { SkillWithCategory } from "@/utils/actions/skills";
 import type { Hackathons as Hackathon } from "@/utils/supabase/types";
 import type { Resumes } from "@/utils/supabase/types";
 import { signOut } from "@/utils/actions/sign-out";
@@ -21,6 +23,8 @@ interface AdminDashboardProps {
     initialHackathons: Hackathon[];
     initialResumes: Resumes[];
     initialAboutSettings: AboutSettings | null;
+    initialSkillCategories: SkillCategories[];
+    initialSkills: SkillWithCategory[];
 }
 
 export function AdminDashboard({
@@ -32,6 +36,8 @@ export function AdminDashboard({
     initialHackathons,
     initialResumes,
     initialAboutSettings,
+    initialSkillCategories,
+    initialSkills,
 }: AdminDashboardProps) {
     const [activeTab, setActiveTab] = useState("overview");
 
@@ -61,6 +67,7 @@ export function AdminDashboard({
         { id: "experiences", label: "Experiências",   icon: Briefcase,       color: "text-green-400"  },
         { id: "projects",    label: "Projetos",       icon: FolderOpen,      color: "text-purple-400" },
         { id: "hackathons",  label: "Hackathons",     icon: Trophy,          color: "text-yellow-400" },
+        { id: "skills",      label: "Tecnologias",    icon: LayoutDashboard, color: "text-red-400"    },
         { id: "links",       label: "Links",          icon: LinkIcon,        color: "text-pink-400"   },
         { id: "resumes",     label: "Currículos",     icon: FileText,        color: "text-cyan-400"   },
         { id: "analytics",   label: "Analytics",      icon: BarChart3,       color: "text-orange-400" },
@@ -373,14 +380,25 @@ export function AdminDashboard({
 
                         <TabsContent
                             value="hackathons"
-                            className="animate-fadeInUp"
+                            className="animate-fadeInUp mt-0"
                         >
                             <HackathonManager
                                 initialHackathons={initialHackathons}
                             />
                         </TabsContent>
 
-                        <TabsContent value="links" className="animate-fadeInUp">
+                        <TabsContent
+                            value="skills"
+                            className="animate-fadeInUp mt-0"
+                        >
+                            <SkillsManager
+                                initialCategories={initialSkillCategories}
+                                initialSkills={initialSkills}
+                            />
+                        </TabsContent>
+
+                        <TabsContent
+                            value="links" className="animate-fadeInUp">
                             <LinksManager
                                 initialLinks={initialLinks}
                                 profileSettings={profileSettings}

@@ -1,59 +1,33 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import type { SkillCategories } from "@/utils/supabase/types";
+import type { SkillWithCategory } from "@/utils/actions/skills";
 
-interface SkillItem {
-    name: string;
-    category: string;
-    icon: string;
+interface SkillsToolsContentProps {
+    categories: SkillCategories[];
+    skills: SkillWithCategory[];
 }
 
-export function SkillsToolsContent() {
+export function SkillsToolsContent({ categories, skills }: SkillsToolsContentProps) {
     const [activeFilter, setActiveFilter] = useState("Todos");
+    
+    // Fallback pra garantir render initial state hydration compatível com SEO se não houve categories ainda
+    useEffect(() => {
+        if (categories.length > 0 && activeFilter === "Todos" && false) {
+            // Pode fazer trigger disso caso no futuro queria abrir no primeiro por padrão
+        }
+    }, [categories]);
 
-    const skills: SkillItem[] = [
-        // Linguagens
-        { name: "HTML", category: "Linguagens", icon: "html" },
-        { name: "CSS", category: "Linguagens", icon: "css" },
-        { name: "JavaScript", category: "Linguagens", icon: "js" },
-        { name: "TypeScript", category: "Linguagens", icon: "ts" },
-        { name: "Python", category: "Linguagens", icon: "py" },
-        { name: "Lua", category: "Linguagens", icon: "lua" },
-
-        // Frameworks
-        { name: "React", category: "Frameworks", icon: "react" },
-        { name: "Node.js", category: "Frameworks", icon: "nodejs" },
-        { name: "Next.js", category: "Frameworks", icon: "nextjs" },
-        { name: "Discord.js", category: "Frameworks", icon: "discordjs" },
-
-        // Ferramentas
-        { name: "VS Code", category: "Ferramentas", icon: "vscode" },
-        { name: "Figma", category: "Ferramentas", icon: "figma" },
-        { name: "Replit", category: "Ferramentas", icon: "replit" },
-        { name: "Git", category: "Ferramentas", icon: "git" },
-        { name: "GitHub", category: "Ferramentas", icon: "github" },
-        { name: "Discord", category: "Ferramentas", icon: "discord" },
-
-        // Bancos de Dados
-        { name: "Firebase", category: "Bancos de Dados", icon: "firebase" },
-        { name: "MongoDB", category: "Bancos de Dados", icon: "mongodb" },
-        { name: "Supabase", category: "Bancos de Dados", icon: "supabase" },
-    ];
-
-    const filters = [
-        "Todos",
-        "Linguagens",
-        "Frameworks",
-        "Ferramentas",
-        "Bancos de Dados",
-    ];
+    // Extrair array de strings pra simular os filters tabs
+    const filters = ["Todos", ...categories.map(c => c.name)];
 
     const filteredSkills =
         activeFilter === "Todos"
             ? skills
-            : skills.filter((skill) => skill.category === activeFilter);
+            : skills.filter((skill) => skill.skill_categories?.name === activeFilter);
 
     return (
         <>
@@ -90,7 +64,7 @@ export function SkillsToolsContent() {
                     >
                         <div className="w-12 h-12 md:w-16 md:h-16 mb-3 md:mb-4 flex items-center justify-center">
                             <Image
-                                src={`https://skillicons.dev/icons?i=${skill.icon}`}
+                                src={`https://skillicons.dev/icons?i=${skill.icon_name || 'github'}`}
                                 alt={skill.name}
                                 width={64}
                                 height={64}

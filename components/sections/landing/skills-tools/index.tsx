@@ -1,6 +1,13 @@
 import { SkillsToolsContent } from "./content";
+import type { SkillCategories } from "@/utils/supabase/types";
+import type { SkillWithCategory } from "@/utils/actions/skills";
 
-export function SkillsToolsSection() {
+interface SkillsToolsSectionProps {
+    categories: SkillCategories[];
+    skills: SkillWithCategory[];
+}
+
+export function SkillsToolsSection({ categories = [], skills = [] }: SkillsToolsSectionProps) {
     return (
         <section className="py-16 md:py-20 bg-gray-900/50">
             <div className="container mx-auto px-0">
@@ -13,7 +20,7 @@ export function SkillsToolsSection() {
                     </p>
                 </div>
 
-                <SkillsToolsContent />
+                <SkillsToolsContent categories={categories} skills={skills} />
             </div>
         </section>
     );

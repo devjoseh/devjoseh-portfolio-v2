@@ -4,6 +4,7 @@ import { getProjects, getExperiences } from "@/utils/actions/data";
 import { getHackathons } from "@/utils/actions/admin";
 import { getAllResumes } from "@/utils/actions/resume";
 import { getAboutSettings } from "@/utils/actions/about";
+import { getSkillCategories, getSkillsPublic } from "@/utils/actions/skills";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -21,6 +22,8 @@ export default async function AdminPage() {
         hackathons,
         resumes,
         aboutSettings,
+        skillCategories,
+        skills,
     ] = await Promise.all([
         getProjects(),
         getExperiences(),
@@ -30,6 +33,8 @@ export default async function AdminPage() {
         getHackathons(),
         getAllResumes(),
         getAboutSettings(),
+        getSkillCategories(),
+        getSkillsPublic(),
     ]);
 
     return (
@@ -42,6 +47,8 @@ export default async function AdminPage() {
             initialHackathons={hackathons}
             initialResumes={resumes}
             initialAboutSettings={aboutSettings}
+            initialSkillCategories={skillCategories}
+            initialSkills={skills}
         />
     );
 }

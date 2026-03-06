@@ -102,3 +102,12 @@ export type Resumes = {
     created_at: string;
     updated_at: string;
 }
+
+export type AboutSettings = {
+    id: string;
+    bio: string;
+    profile_image_url: string | null;
+    social_links: Array<{ icon: string; name: string; url: string }>;
+    created_at: string;
+    updated_at: string;
+}

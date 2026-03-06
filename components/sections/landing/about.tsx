@@ -1,12 +1,36 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Linkedin, Instagram, Youtube, Github, ExternalLink } from "lucide-react";
+import { Linkedin, Instagram, Youtube, Github, ExternalLink, Mail, Twitter, Facebook, Globe, Link as LinkIcon, Twitch, Disc, Code, PenTool, Coffee, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
 import Link from "next/link";
+import type { AboutSettings } from "@/utils/supabase/types";
 
-export function AboutSection() {
-    const socialLinks = [
+const ICON_MAP: Record<string, any> = {
+    Linkedin,
+    Instagram,
+    Youtube,
+    Github,
+    Mail,
+    Twitter,
+    Facebook,
+    Globe,
+    LinkIcon,
+    Twitch,
+    Disc,
+    Code,
+    PenTool,
+    Coffee, 
+    FileText
+};
+
+export function AboutSection({ aboutSettings }: { aboutSettings?: AboutSettings | null }) {
+    const socialLinks = aboutSettings?.social_links?.length ? aboutSettings.social_links.map(link => ({
+        name: link.name,
+        icon: ICON_MAP[link.icon as keyof typeof ICON_MAP] || LinkIcon,
+        url: link.url,
+        color: "hover:bg-purple-600/10 hover:border-purple-500", // Default dynamic styling
+    })) : [
         {
             name: "LinkedIn",
             icon: Linkedin,
@@ -72,7 +96,7 @@ export function AboutSection() {
                             <div className="relative">
                                 <div className="w-48 h-48 md:w-56 md:h-56 rounded-full overflow-hidden border-4 border-purple-500/30 shadow-2xl">
                                     <Image
-                                        src="/pfp2.webp?height=224&width=224"
+                                        src={aboutSettings?.profile_image_url || "/pfp2.webp"}
                                         alt="José Hernanes - DevJoseH"
                                         width={224}
                                         height={224}
@@ -107,25 +131,29 @@ export function AboutSection() {
                         {/* About Text */}
                         <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
                             <CardContent className="p-6">
-                                <p className="text-gray-300 leading-relaxed text-sm md:text-base">
-                                    Tenho 17 anos, estou cursando Análise e
-                                    Desenvolvimento de Sistemas e iniciei na
-                                    programação aos 12 criando e ensinando as
-                                    pessoas a criarem bots para o discord no meu
-                                    canal do YouTube.
-                                    <br />
-                                    <br />
-                                    Sou fundador e idealizador do projeto
-                                    EducaAvalia, um aplicativo de avaliações de
-                                    escolas inclusivas e acessíveis para alunos
-                                    com deficiência.
-                                    <br />
-                                    <br />
-                                    Atualmente, atuo como desenvolvedor
-                                    back-end, apaixonado por resolver desafios.
-                                    Nas horas vagas, sou designer e rato de
-                                    hackathons.
-                                </p>
+                                <div className="text-gray-300 leading-relaxed text-sm md:text-base whitespace-pre-wrap">
+                                    {aboutSettings?.bio || (
+                                        <>
+                                            Tenho 17 anos, estou cursando Análise e
+                                            Desenvolvimento de Sistemas e iniciei na
+                                            programação aos 12 criando e ensinando as
+                                            pessoas a criarem bots para o discord no meu
+                                            canal do YouTube.
+                                            <br />
+                                            <br />
+                                            Sou fundador e idealizador do projeto
+                                            EducaAvalia, um aplicativo de avaliações de
+                                            escolas inclusivas e acessíveis para alunos
+                                            com deficiência.
+                                            <br />
+                                            <br />
+                                            Atualmente, atuo como desenvolvedor
+                                            back-end, apaixonado por resolver desafios.
+                                            Nas horas vagas, sou designer e rato de
+                                            hackathons.
+                                        </>
+                                    )}
+                                </div>
                             </CardContent>
                         </Card>
                     </div>

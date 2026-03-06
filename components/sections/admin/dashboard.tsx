@@ -1,11 +1,12 @@
 "use client";
 
-import { LayoutDashboard, Briefcase, FolderOpen, Trophy, LinkIcon, BarChart3, ArrowLeft, Settings, LogOut } from "lucide-react";
-import { ExperienceManager, HackathonManager, LinksManager, AnalyticsDashboard, ProjectManager } from "../../index"
+import { LayoutDashboard, Briefcase, FolderOpen, Trophy, LinkIcon, BarChart3, ArrowLeft, Settings, LogOut, FileText } from "lucide-react";
+import { ExperienceManager, HackathonManager, LinksManager, AnalyticsDashboard, ProjectManager, ResumeManager } from "../../index"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import type { Link as dbLink, ProfileSettings } from "@/utils/actions/links";
-import type { Hackathon } from "@/utils/actions/admin";
+import type { Links as dbLink, ProfileSettings } from "@/utils/supabase/types";
+import type { Hackathons as Hackathon } from "@/utils/supabase/types";
+import type { Resumes } from "@/utils/supabase/types";
 import { signOut } from "@/utils/actions/sign-out";
 import { Button, Badge } from "@/components/index";
 import { useState } from "react";
@@ -18,6 +19,7 @@ interface AdminDashboardProps {
     profileSettings: ProfileSettings | null;
     analytics: any[];
     initialHackathons: Hackathon[];
+    initialResumes: Resumes[];
 }
 
 export function AdminDashboard({
@@ -27,6 +29,7 @@ export function AdminDashboard({
     profileSettings,
     analytics,
     initialHackathons,
+    initialResumes,
 }: AdminDashboardProps) {
     const [activeTab, setActiveTab] = useState("overview");
 
@@ -51,42 +54,13 @@ export function AdminDashboard({
     };
 
     const tabConfig = [
-        {
-            id: "overview",
-            label: "Visão Geral",
-            icon: LayoutDashboard,
-            color: "text-blue-400",
-        },
-        {
-            id: "experiences",
-            label: "Experiências",
-            icon: Briefcase,
-            color: "text-green-400",
-        },
-        {
-            id: "projects",
-            label: "Projetos",
-            icon: FolderOpen,
-            color: "text-purple-400",
-        },
-        {
-            id: "hackathons",
-            label: "Hackathons",
-            icon: Trophy,
-            color: "text-yellow-400",
-        },
-        {
-            id: "links",
-            label: "Links",
-            icon: LinkIcon,
-            color: "text-pink-400",
-        },
-        {
-            id: "analytics",
-            label: "Analytics",
-            icon: BarChart3,
-            color: "text-orange-400",
-        },
+        { id: "overview",    label: "Visão Geral",   icon: LayoutDashboard, color: "text-blue-400"   },
+        { id: "experiences", label: "Experiências",   icon: Briefcase,        color: "text-green-400" },
+        { id: "projects",    label: "Projetos",        icon: FolderOpen,       color: "text-purple-400"},
+        { id: "hackathons",  label: "Hackathons",      icon: Trophy,           color: "text-yellow-400"},
+        { id: "links",       label: "Links",           icon: LinkIcon,         color: "text-pink-400"  },
+        { id: "resumes",     label: "Currículos",      icon: FileText,         color: "text-cyan-400"  },
+        { id: "analytics",   label: "Analytics",       icon: BarChart3,        color: "text-orange-400"},
     ];
 
     return (
@@ -145,7 +119,7 @@ export function AdminDashboard({
                     >
                         <div className="w-full">
                             <TabsList className="w-full h-auto p-1 bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 rounded-xl shadow-lg">
-                                <div className="grid grid-cols-3 md:grid-cols-6 gap-1 w-full">
+                        <div className="grid grid-cols-3 md:grid-cols-7 gap-1 w-full">
                                     {tabConfig.map((tab) => (
                                         <TabsTrigger
                                             key={tab.id}
@@ -398,6 +372,10 @@ export function AdminDashboard({
                                 initialLinks={initialLinks}
                                 profileSettings={profileSettings}
                             />
+                        </TabsContent>
+
+                        <TabsContent value="resumes" className="animate-fadeInUp">
+                            <ResumeManager initialResumes={initialResumes} />
                         </TabsContent>
 
                         <TabsContent

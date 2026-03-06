@@ -91,3 +91,14 @@ export type ProfileSettings = {
     created_at: string;
     updated_at: string;
 }
+
+export type Resumes = {
+    id: string;
+    language: string;     // 'pt-BR' | 'en'
+    label: string;        // 'Português' | 'English'
+    file_url: string;
+    file_name: string;
+    is_active: boolean;
+    created_at: string;
+    updated_at: string;
+}

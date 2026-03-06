@@ -1,6 +1,9 @@
+import { getActiveResumes } from "@/utils/actions/resume";
 import { HeroContent } from "./content";
 
-export function HeroSection() {
+export async function HeroSection() {
+    const resumes = await getActiveResumes();
+
     return (
         <section className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900">
             <div className="absolute inset-0 overflow-hidden">
@@ -20,7 +23,7 @@ export function HeroSection() {
             </div>
 
             <div className="container mx-auto px-4 md:px-8 lg:px-12 xl:px-16 z-10 w-full">
-                <HeroContent />
+                <HeroContent resumes={resumes} />
             </div>
 
             <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-b from-transparent via-gray-900/50 to-gray-900 pointer-events-none" />

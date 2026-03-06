@@ -1,45 +1,25 @@
 "use server";
 
 import { createClient } from "../supabase/server";
+import type { Links, LinkClicks, ProfileSettings } from "../supabase/types";
 
-export interface Link {
-    id: string;
-    title: string;
-    url: string;
-    description: string | null;
-    icon_name: string | null;
-    background_color: string;
-    text_color: string;
-    is_active: boolean;
-    order_index: number;
-    click_count: number;
-    created_at: string;
-    updated_at: string;
-}
+// Re-export canonical types for convenience
+export type { Links, LinkClicks, ProfileSettings };
 
-export interface ProfileSettings {
-    id: string;
-    profile_name: string;
-    profile_bio: string;
-    profile_image_url: string | null;
-    background_type: string;
-    background_value: string;
-    theme: string;
-    custom_css: string | null;
-    created_at: string;
-    updated_at: string;
-}
-
-export interface LinkClick {
-    id: string;
-    link_id: string;
+// Type for analytics query result (join between link_clicks and links)
+export interface LinkAnalyticsEntry {
     clicked_at: string;
-    user_agent: string | null;
-    ip_address: string | null;
-    referrer: string | null;
+    links: Array<{
+        title: string;
+        id: string;
+    }> | null;
 }
 
-export async function getActiveLinks(): Promise<Link[]> {
+// NOTE: reorderLinks also exists in utils/actions/admin.ts using the bypass (service-role)
+// client. That version is for admin use where RLS must be bypassed. This version uses the
+// standard authenticated client for non-privileged operations.
+
+export async function getActiveLinks(): Promise<Links[]> {
     const supabase = await createClient();
 
     const { data, error } = await supabase
@@ -56,7 +36,7 @@ export async function getActiveLinks(): Promise<Link[]> {
     return data || [];
 }
 
-export async function getAllLinks(): Promise<Link[]> {
+export async function getAllLinks(): Promise<Links[]> {
     const supabase = await createClient();
 
     const { data, error } = await supabase
@@ -115,7 +95,7 @@ export async function trackLinkClick(
 
 export async function updateLink(
     linkId: string,
-    updates: Partial<Link>
+    updates: Partial<Links>
 ): Promise<boolean> {
     const supabase = await createClient();
 
@@ -133,7 +113,7 @@ export async function updateLink(
 }
 
 export async function createLink(
-    link: Omit<Link, "id" | "created_at" | "updated_at" | "click_count">
+    link: Omit<Links, "id" | "created_at" | "updated_at" | "click_count">
 ): Promise<boolean> {
     const supabase = await createClient();
 
@@ -183,7 +163,7 @@ export async function updateProfileSettings(
     return true;
 }
 
-export async function getLinkAnalytics(days = 30): Promise<any[]> {
+export async function getLinkAnalytics(days = 30): Promise<LinkAnalyticsEntry[]> {
     const supabase = await createClient();
 
     const { data, error } = await supabase

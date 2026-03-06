@@ -49,7 +49,10 @@ export function ExperienceContent({ experiences }: { experiences: Experience[] }
     }, [experiences]);
 
     const formatDate = (dateString: string) => {
-        return new Date(dateString).toLocaleDateString("pt-BR", {
+        // Parse as local date to avoid UTC-offset shifting the day (and thus the month).
+        // "2025-03-01" interpreted as UTC midnight becomes Feb 28 in UTC-3.
+        const [year, month, day] = dateString.split("T")[0].split("-").map(Number);
+        return new Date(year, month - 1, day).toLocaleDateString("pt-BR", {
             year: "numeric",
             month: "short",
         });

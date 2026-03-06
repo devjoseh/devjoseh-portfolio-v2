@@ -1,45 +1,13 @@
 "use server";
 
 import { createClient } from "../supabase/server";
+import type { Projects, Skills, Experiences } from "../supabase/types";
 
-type Project = {
-    id: string
-    title: string
-    description: string
-    long_description: string | null
-    technologies: string[]
-    github_url: string | null
-    live_url: string | null
-    image_url: string | null
-    featured: boolean
-    order_index: number
-    created_at: string
-    updated_at: string
-}
+// Re-export for convenience
+export type { Projects, Skills, Experiences };
 
-type Skill = {
-    id: string
-    name: string
-    category: string
-    proficiency: number
-    icon_name: string | null
-    created_at: string
-}
-
-type Experience = {
-    id: string
-    company: string
-    position: string
-    description: string
-    start_date: string
-    end_date: string | null
-    is_current: boolean
-    location: string | null
-    technologies: string[]
-    created_at: string
-}
-
-export interface Hackathon {
+// Public-facing DTO for hackathons (camelCase, mapped from DB snake_case)
+export interface HackathonDTO {
     id: string;
     title: string;
     date: string;
@@ -50,7 +18,7 @@ export interface Hackathon {
     photos: Array<{ id: string; url: string; alt: string }>;
 }
 
-export async function getProjects(): Promise<Project[]> {
+export async function getProjects(): Promise<Projects[]> {
     const supabase = await createClient();
 
     const { data, error } = await supabase
@@ -66,7 +34,7 @@ export async function getProjects(): Promise<Project[]> {
     return data || [];
 }
 
-export async function getFeaturedProjects(): Promise<Project[]> {
+export async function getFeaturedProjects(): Promise<Projects[]> {
     const supabase = await createClient();
 
     const { data, error } = await supabase
@@ -83,7 +51,7 @@ export async function getFeaturedProjects(): Promise<Project[]> {
     return data || [];
 }
 
-export async function getHackathons(): Promise<Hackathon[]> {
+export async function getHackathons(): Promise<HackathonDTO[]> {
     const supabase = await createClient();
 
     const { data, error } = await supabase
@@ -109,7 +77,7 @@ export async function getHackathons(): Promise<Hackathon[]> {
     }));
 }
 
-export async function getSkills(): Promise<Skill[]> {
+export async function getSkills(): Promise<Skills[]> {
     const supabase = await createClient();
 
     const { data, error } = await supabase
@@ -125,7 +93,7 @@ export async function getSkills(): Promise<Skill[]> {
     return data || [];
 }
 
-export async function getExperiences(): Promise<Experience[]> {
+export async function getExperiences(): Promise<Experiences[]> {
     const supabase = await createClient();
 
     const { data, error } = await supabase

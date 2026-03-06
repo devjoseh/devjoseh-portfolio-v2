@@ -1,52 +1,15 @@
 "use server";
 
+// Uses the service-role bypass client to skip RLS, allowing admin CRUD operations
+// without being blocked by the row-level security policies that restrict public access.
 import { createBypassClient } from "../supabase/bypass";
+import type { Hackathons, Projects, Experiences } from "../supabase/types";
 
-export interface Hackathon {
-    id: string;
-    title: string;
-    date: string;
-    cover_image_url: string | null;
-    placement: string;
-    placement_type: "winner" | "finalist" | "participant";
-    description: string;
-    photos: Array<{ id: string; url: string; alt: string }>;
-    order_index: number;
-    is_active: boolean;
-    created_at: string;
-    updated_at: string;
-}
-
-type Project = {
-    id: string
-    title: string
-    description: string
-    long_description: string | null
-    technologies: string[]
-    github_url: string | null
-    live_url: string | null
-    image_url: string | null
-    featured: boolean
-    order_index: number
-    created_at: string
-    updated_at: string
-}
-
-type Experience = {
-    id: string
-    company: string
-    position: string
-    description: string
-    start_date: string
-    end_date: string | null
-    is_current: boolean
-    location: string | null
-    technologies: string[]
-    created_at: string
-}
+// Re-export so consumers of this module can stay in sync with canonical types
+export type { Hackathons, Projects, Experiences };
 
 // HACKATHONS
-export async function getHackathons(): Promise<Hackathon[]> {
+export async function getHackathons(): Promise<Hackathons[]> {
     const supabase = createBypassClient();
 
     const { data, error } = await supabase
@@ -63,7 +26,7 @@ export async function getHackathons(): Promise<Hackathon[]> {
 }
 
 export async function createHackathon(
-    hackathon: Omit<Hackathon, "id" | "created_at" | "updated_at">
+    hackathon: Omit<Hackathons, "id" | "created_at" | "updated_at">
 ): Promise<boolean> {
     const supabase = createBypassClient();
 
@@ -81,7 +44,7 @@ export async function createHackathon(
 
 export async function updateHackathon(
     id: string,
-    updates: Partial<Hackathon>
+    updates: Partial<Hackathons>
 ): Promise<boolean> {
     const supabase = createBypassClient();
 
@@ -131,7 +94,7 @@ export async function reorderHackathons(ids: string[]): Promise<boolean> {
 
 // PROJECTS
 export async function createProject(
-    project: Omit<Project, "id" | "created_at" | "updated_at">
+    project: Omit<Projects, "id" | "created_at" | "updated_at">
 ): Promise<boolean> {
     const supabase = createBypassClient();
 
@@ -149,7 +112,7 @@ export async function createProject(
 
 export async function updateProject(
     id: string,
-    updates: Partial<Project>
+    updates: Partial<Projects>
 ): Promise<boolean> {
     const supabase = createBypassClient();
 
@@ -199,7 +162,7 @@ export async function reorderProjects(ids: string[]): Promise<boolean> {
 
 // EXPERIENCES
 export async function createExperience(
-    experience: Omit<Experience, "id" | "created_at">
+    experience: Omit<Experiences, "id" | "created_at">
 ): Promise<boolean> {
     const supabase = createBypassClient();
 
@@ -217,7 +180,7 @@ export async function createExperience(
 
 export async function updateExperience(
     id: string,
-    updates: Partial<Experience>
+    updates: Partial<Experiences>
 ): Promise<boolean> {
     const supabase = createBypassClient();
 
